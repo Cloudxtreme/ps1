@@ -9,11 +9,11 @@ Major Steps
 -----
   1.  Start project
     - [x] Start this file.
-    - [ ] Start offline bug and time logs
-    - [ ] Estimate time for all steps
-    - [ ] Add .gitignore
-    - [ ] Create skeleton directory structure
-    - [ ] Create way to push to GitHub
+    - [x] Start offline bug and time logs
+    - [x] Estimate time for all steps
+    - [x] Add .gitignore
+    - [x] Create skeleton directory structure
+    - [x] Create way to push to GitHub
     - [ ] Yarn basic packages:  mocha, express, webpack, react
     - [ ] Write simplistic test (test_true) and add yarn target
     - [ ] Write core index
