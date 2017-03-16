@@ -16,11 +16,12 @@ Major Steps
     - [x] Create way to push to GitHub
     - [x] Yarn basic packages:  mocha, express, webpack, react
     - [x] Write simplistic test (test_true) and add yarn target
-    - [ ] Write core index
+    - [ ] Make eslint work correctly in Atom
 
   2.  Skeleton of site
     - [ ] write components for MainPage, BuilderPage, CreditsPage, PopularPage, LessonPage
     - [ ] write tests for each component
+    - [ ] Write core index
     - [ ] write router
     - [ ] write tests for router
 
