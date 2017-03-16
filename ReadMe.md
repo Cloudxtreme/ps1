@@ -19,7 +19,7 @@ Major Steps
     - [x] Make eslint work correctly in Atom
 
   2.  Skeleton of site
-    - [ ] write components for MainPage, BuilderPage, CreditsPage, PopularPage, LessonPage
+    - [x] write components for MainPage, BuilderPage, CreditsPage, PopularPage, LessonPage
     - [ ] write tests for each component
     - [ ] Write core index
     - [ ] write router
