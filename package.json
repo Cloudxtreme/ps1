@@ -6,6 +6,10 @@
   "repository": "git@github.com:merriam/ps1.git",
   "author": "Charles Merriam <charles.merriam@gmail.com>",
   "license": "AAL",
+  "scripts": {
+    "test": "mocha src",
+    "push": "git push origin master"
+  },
   "devDependencies": {
     "express": "*",
     "mustache": "*",
