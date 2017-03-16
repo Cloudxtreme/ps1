@@ -20,6 +20,7 @@
     "eslint-plugin-react": "*",
     "jshint": "*",
     "mocha": "*",
+    "should": "*",
     "webpack": "*"
   },
   "dependencies": {

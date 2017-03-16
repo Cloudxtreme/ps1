@@ -15,7 +15,7 @@ Major Steps
     - [x] Create skeleton directory structure
     - [x] Create way to push to GitHub
     - [x] Yarn basic packages:  mocha, express, webpack, react
-    - [ ] Write simplistic test (test_true) and add yarn target
+    - [x] Write simplistic test (test_true) and add yarn target
     - [ ] Write core index
 
   2.  Skeleton of site
