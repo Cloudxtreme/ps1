@@ -16,7 +16,7 @@ Major Steps
     - [x] Create way to push to GitHub
     - [x] Yarn basic packages:  mocha, express, webpack, react
     - [x] Write simplistic test (test_true) and add yarn target
-    - [ ] Make eslint work correctly in Atom
+    - [x] Make eslint work correctly in Atom
 
   2.  Skeleton of site
     - [ ] write components for MainPage, BuilderPage, CreditsPage, PopularPage, LessonPage

@@ -1,6 +1,6 @@
 {
   "name": "ps1",
-  "version": "0.1",
+  "version": "0.2",
   "description": "Generate prompts, the Bash PS1 variable, from an interactive webpage",
   "main": "index.js",
   "repository": "git@github.com:merriam/ps1.git",
