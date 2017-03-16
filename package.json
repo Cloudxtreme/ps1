@@ -7,7 +7,7 @@
   "author": "Charles Merriam <charles.merriam@gmail.com>",
   "license": "AAL",
   "scripts": {
-    "test": "mocha src",
+    "test": "mocha 'src/**/test*.js'",
     "push": "git push origin master"
   },
   "devDependencies": {
