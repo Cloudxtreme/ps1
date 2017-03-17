@@ -5,10 +5,10 @@ function four() {
   return 1 + 1 + 1 + 1;
 }
 
-describe('Basic Sanity Test', () => {
+describe('Basic S anity Test', () => {
   describe('different ways to test', () => {
     it('should count to 4 without crashing', () => 1 + 1 + 1 + 1);
-    it('should assert being calling a function', function count() {
+    it('should assert within a named function', function count() {
       const assert = require('assert');
       assert(four() === 4);
     });
