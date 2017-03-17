@@ -6,7 +6,7 @@ function four() {
   return 1 + 1 + 1 + 1;
 }
 
-describe('Basic S anity Test', () => {
+describe('Basic Sanity Test', () => {
   describe('different ways to test', () => {
     it('should count to 4 without crashing', () => 1 + 1 + 1 + 1);
     it('should assert within a named function', function count() {
