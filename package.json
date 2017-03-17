@@ -7,7 +7,7 @@
   "author": "Charles Merriam <charles.merriam@gmail.com>",
   "license": "AAL",
   "scripts": {
-    "test": "mocha 'src/**/test*.js'",
+    "test": "mocha --compilers mochaCompiler.js 'src/**/test*.js'",
     "push": "git push origin master"
   },
   "devDependencies": {
@@ -21,7 +21,7 @@
     "mocha": "*",
     "mustache": "*",
     "react-tools": "^0.13.3",
-    "should": "*",
+    "should": "^11.2.1",
     "webpack": "*"
   },
   "dependencies": {
