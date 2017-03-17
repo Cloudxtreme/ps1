@@ -1,7 +1,9 @@
 {
   "extends": "eslint-config-airbnb",
   "plugins": [
-    "react"
+    "react",
+    "import",
+    "prefer-object-spread"
   ],
   "settings": {
     "react": {
@@ -23,7 +25,8 @@
     "react/prefer-stateless-function": "warn",
     "react/prop-types": "off",
     "jsx-a11y/img-has-alt": "warn",
-    "prefer-arrow-callback": "off"
+    "prefer-arrow-callback": "off",
+    "prefer-object-spread/prefer-object-spread": "error"
   },
   "globals": {
     "describe": true,

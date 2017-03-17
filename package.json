@@ -18,6 +18,7 @@
     "eslint-config-airbnb": "*",
     "eslint-plugin-import": "*",
     "eslint-plugin-jsx-a11y": "*",
+    "eslint-plugin-prefer-object-spread": "^1.1.0",
     "eslint-plugin-react": "^6.10.0",
     "express": "*",
     "jshint": "*",
