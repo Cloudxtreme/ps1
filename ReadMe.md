@@ -68,11 +68,11 @@ Major Steps
   9.  Launch
     - [ ]  Pick a date in advance.
     - [ ]  Make list of prerelease actions:
-      - [ ]    Buy ads for those days.
-      - [ ]   Make verbiage for HackerNews, Slashdot, Reddit, Twitter, a few other places.
+      - [ ]  Buy ads for those days.
+      - [ ]  Make verbiage for HackerNews, Slashdot, Reddit, Twitter, a few other places.
       - [ ]  Prepare short video.
-      - [ ]   Prepare press release
-      - [ ]    Select mailing lists or meetup groups.
+      - [ ]  Prepare press release
+      - [ ]  Select mailing lists or meetup groups.
 
   10.   Create public roadmap.
     - [ ]  PowerShell support
