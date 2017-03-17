@@ -26,7 +26,15 @@
     "react/prop-types": "off",
     "jsx-a11y/img-has-alt": "warn",
     "prefer-arrow-callback": "off",
-    "prefer-object-spread/prefer-object-spread": "error"
+    "prefer-object-spread/prefer-object-spread": "error",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/test*.js"
+        ]
+      }
+    ]
   },
   "globals": {
     "describe": true,
