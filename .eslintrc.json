@@ -12,7 +12,8 @@
   },
   "parserOptions": {
     "ecmaFeatures": {
-      "jsx": true
+      "jsx": true,
+      "modules": true
     }
   },
   "rules": {
@@ -21,7 +22,8 @@
     "react/jsx-filename-extension": "off",
     "react/prefer-stateless-function": "warn",
     "react/prop-types": "off",
-    "jsx-a11y/img-has-alt": "warn"
+    "jsx-a11y/img-has-alt": "warn",
+    "prefer-arrow-callback": "off"
   },
   "globals": {
     "describe": true,
