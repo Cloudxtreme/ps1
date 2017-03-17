@@ -1,4 +1,5 @@
 /* Really basic JavaScript tests, to see if mocha is running */
+const assert = require('assert');
 require('should');  // side effect is to modify object with 'should' getter.
 
 function four() {
@@ -9,7 +10,6 @@ describe('Basic S anity Test', () => {
   describe('different ways to test', () => {
     it('should count to 4 without crashing', () => 1 + 1 + 1 + 1);
     it('should assert within a named function', function count() {
-      const assert = require('assert');
       assert(four() === 4);
     });
     it('should do the should examples', function done() {
@@ -23,5 +23,11 @@ describe('Basic S anity Test', () => {
       (four()).should.not.equal(5);
     });
     it('should arrow function to four', () => four().should.be.exactly(4));
+  });
+  describe('match should clauses correctly', () => {
+    it('should check substrings', () => {
+      'Good morning!'.should.match(/morning/);
+      ''.should.not.match(/morning/);
+    });
   });
 });
