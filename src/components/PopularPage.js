@@ -2,6 +2,6 @@ import React from 'react';
 
 export default class PopularPage extends React.Component {
   render() {
-    return 'popular page';
+    return (<div className="page-popular"><b>Popular Page</b></div>);
   }
 }

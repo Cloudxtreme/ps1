@@ -20,7 +20,7 @@ Major Steps
 
   2.  Skeleton of site
     - [x] write components for MainPage, BuilderPage, CreditsPage, PopularPage, LessonPage
-    - [ ] write tests for each component
+    - [x] write tests for each component
     - [ ] Write core index
     - [ ] write router
     - [ ] write tests for router
@@ -77,7 +77,6 @@ Major Steps
   10.   Create public roadmap.
     - [ ]  PowerShell support
     - [ ]  Private hosting
-
 
 Directory Structure
 ----

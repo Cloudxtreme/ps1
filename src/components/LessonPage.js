@@ -2,6 +2,6 @@ import React from 'react';
 
 export default class LessonPage extends React.Component {
   render() {
-    return 'lesson page';
+    return (<div className="page-lesson"><b>Lesson Page</b></div>);
   }
 }
