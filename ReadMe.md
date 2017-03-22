@@ -21,8 +21,8 @@ Major Steps
   2.  Skeleton of site
     - [x] write components for MainPage, BuilderPage, CreditsPage, PopularPage, LessonPage
     - [x] write tests for each component
-    - [ ] Write core index
     - [ ] write router
+    - [ ] Write core index
     - [ ] write tests for router
 
   3.  Publish running system
