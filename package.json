@@ -8,7 +8,10 @@
   "license": "AAL",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register 'src/**/test*.js'",
-    "push": "git push origin master"
+    "push": "git push origin master",
+    "start": "if-env NODE_ENV=production && yarn run start:prod || yarn run start:dev",
+    "start:dev": "webpack-dev-server -d --inline --content-base public --history-api-fallback",
+    "start:prod": "webpack && node server.js"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
@@ -29,8 +32,8 @@
     "bootstrap": "^3.3.7",
     "express": "*",
     "react": "*",
-    "react-dom": "*",
-    "react-router": "*"
+    "react-dom": "^15.4.2",
+    "react-router": "^3.0.2",
     "webpack": "^2.3.0"
   }
 }
