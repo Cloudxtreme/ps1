@@ -24,7 +24,6 @@
     "jshint": "*",
     "mocha": "*",
     "mustache": "*",
-    "react-tools": "^0.13.3",
     "should": "^11.2.1",
     "webpack": "*"
   },
