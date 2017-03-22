@@ -39,6 +39,7 @@
   "globals": {
     "describe": true,
     "it": true,
-    "window": true
+    "window": true,
+    "document": true
   }
 }
