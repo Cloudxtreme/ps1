@@ -6,36 +6,44 @@ import CreditsPage from './CreditsPage';
 import LessonPage from './LessonPage';
 import MainPage from './MainPage';
 import PopularPage from './PopularPage';
+import NotFoundPage from './NotFoundPage';
+
+function checkWords(component, word, div) {
+  it(`should render ${word} without crashing`, () => {
+    const element = React.createElement(component);
+    const html = renderToString(element);
+    (html != null).should.be.true();
+  });
+
+  it(`should render function's HTML should have the word '${word}'`, function done() {
+    const element = React.createElement(component);
+    const html = renderToString(element);
+    html.should.match(new RegExp(word));
+  });
+  it(`should have the ${div} div`, () => {
+    const element = React.createElement(component);
+    const html = renderToString(element);
+    html.should.match(new RegExp(`<div[^>]*${div}`));
+  });
+}
 
 describe('Page Components', function done1() {
   describe('BuilderPage', function done2() {
-    it('should render BuilderPage without crashing', () => {
-      const html = renderToString(<BuilderPage />);
-      (html != null).should.be.true();
-    });
-    it("render function's HTML should have the word BuilderPage", function done() {
-      const html = renderToString(<BuilderPage />);
-      html.should.match(/Builder Page/);
-    });
-    it('should have the page-builder div', () => {
-      const html = renderToString(<BuilderPage />);
-      html.should.match(/<div[^>]*page-builder/);
-    });
+    checkWords(BuilderPage, 'Builder Page', 'page-builder');
   });
 
   describe('CreditsPage', function done2() {
-    it('should render CreditsPage without crashing', () => {
-      const html = renderToString(<CreditsPage />);
-      (html != null).should.be.true();
-    });
-    it("render function's HTML should have the word CreditsPage", function done() {
-      const html = renderToString(<CreditsPage />);
-      html.should.match(/Credits Page/);
-    });
-    it('should have the page-credits div', () => {
-      const html = renderToString(<CreditsPage />);
-      html.should.match(/<div[^>]*page-credits/);
-    });
+    checkWords(CreditsPage, 'Credits Page', 'page-credits');
+  });
+
+  describe('LessonPage', function done2() {
+    checkWords(LessonPage, 'Lesson Page', 'page-lesson');
+  });
+  describe('PopularPage', function done2() {
+    checkWords(PopularPage, 'Popular Page', 'page-popular');
+  });
+  describe('NotFoundPage', function done2() {
+    checkWords(NotFoundPage, 'Not Found', 'page-not-found');
   });
 
   describe('LessonPage', function done2() {

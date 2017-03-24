@@ -2,6 +2,6 @@ import React from 'react';
 
 export default class NotFoundPage extends React.Component {
   render() {
-    return (<h2>Not Found Page</h2>);
+    return (<div className="page-not-found"><b>Not Found Page</b></div>);
   }
 }
