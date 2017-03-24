@@ -6,6 +6,7 @@ import CreditsPage from './components/CreditsPage';
 import LessonPage from './components/LessonPage';
 import MainPage from './components/MainPage';
 import PopularPage from './components/PopularPage';
+import NotFoundPage from './components/NotFoundPage';
 
 render((
   <Router history={browserHistory}>
@@ -16,6 +17,7 @@ render((
       <Route path="/credits" component={CreditsPage} />
       <Route path="/lesson" component={LessonPage} />
       <Route path="/popular" component={PopularPage} />
+      <Route path="*" component={NotFoundPage} />
     </Route>
   </Router>
 ), document.getElementById('app'));

@@ -11,6 +11,9 @@ export default class MainPage extends React.Component {
           <li><Link to="/lesson">Lessons Page</Link></li>
           <li><Link to="/credits">Credits Page</Link></li>
           <li><Link to="/popular">Popular Page</Link></li>
+          <li><Link to="/index.html">Index.html</Link></li>
+          <li><Link to="/sdr234">URL not found</Link></li>
+          <li><Link to="/NotFound">Not Found Page</Link></li>
         </ul>
         {this.props.children}
       </div>);
