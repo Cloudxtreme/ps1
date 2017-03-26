@@ -1,21 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Navbar, Nav, NavItem, Jumbotron } from 'react-bootstrap';
 
 export default class MainPage extends React.Component {
   render() {
     return (
       <div className="page-main">
-        <h2>Main Page</h2>
-        <ul>
-          <li><Link to="/build">Builder Page</Link></li>
-          <li><Link to="/lesson">Lessons Page</Link></li>
-          <li><Link to="/credits">Credits Page</Link></li>
-          <li><Link to="/popular">Popular Page</Link></li>
-          <li><Link to="/index.html">Index.html</Link></li>
-          <li><Link to="/sdr234">URL not found</Link></li>
-          <li><Link to="/NotFound">Not Found Page</Link></li>
-        </ul>
-        {this.props.children}
+        <div className="container-fluid">
+          <Jumbotron bsClass="bg-primary bg-center">
+            <h1>PS1 - The Bash Prompt</h1>
+            <h3>Create a beautiful prompt for your Bash terminal shell.</h3>
+          </Jumbotron>
+
+          <Navbar inverse>
+            <Nav>
+              <NavItem eventKey={1} href="/build" />
+              <NavItem eventKey={1} href="/lesson">Lessons Page</NavItem>
+              <NavItem eventKey={2} href="/credits">Credits Page</NavItem>
+              <NavItem eventKey={3} href="/popular">Popular Page</NavItem>
+              <NavItem eventKey={4} href="/index.html">Index.html</NavItem>
+              <NavItem eventKey={5} href="/sdr234">URL not found</NavItem>
+            </Nav>
+          </Navbar>
+          {this.props.children}
+        </div>
       </div>);
   }
 }
