@@ -5,13 +5,14 @@ export default class MainPage extends React.Component {
   render() {
     return (
       <div className="page-main">
+        <h2>The Main Page</h2>
         <div className="container-fluid">
-          <Jumbotron bsClass="bg-primary bg-center">
-            <h1>PS1 - The Bash Prompt</h1>
-            <h3>Create a beautiful prompt for your Bash terminal shell.</h3>
-          </Jumbotron>
+          <Navbar bsClass="bg-center">
+            <Navbar.Header>
+              <h1>PS1 - The Bash Prompt</h1>
+              <h3>Create a beautiful prompt for your Bash terminal shell.</h3>
+            </Navbar.Header>
 
-          <Navbar inverse>
             <Nav>
               <NavItem eventKey={1} href="/build" />
               <NavItem eventKey={1} href="/lesson">Lessons Page</NavItem>
