@@ -29,13 +29,14 @@
     "mocha": "*",
     "mustache": "*",
     "should": "^11.2.1",
+    "supertest": "^3.0.0",
     "webpack-dev-server": "^2.4.2"
   },
   "dependencies": {
-    "bootstrap": "^3.3.7",
     "express": "*",
     "if-env": "^1.0.0",
     "react": "*",
+    "react-bootstrap": "^0.30.8",
     "react-dom": "^15.4.2",
     "react-router": "^3.0.2",
     "webpack": "^2.3.0"

@@ -23,7 +23,7 @@ Major Steps
     - [x] write tests for each component
     - [x] write router
     - [x] Write core index
-    - [ ] write tests for router
+    - [x] write tests for router
 
   3.  Publish running system
     - [ ]  Select a RackSpace or DigitalOcean based on reasons.
