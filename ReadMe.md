@@ -26,11 +26,15 @@ Major Steps
     - [x] write tests for router
 
   3.  Publish running system
-    - [ ]  Select a RackSpace or DigitalOcean based on reasons.
-    - [ ]  Manually deploy to system.
-    - [ ]  Find appropriate push tool.
-    - [ ]  Create target that runs tests, then commits, then publishes
-
+    - [X]  Select a RackSpace or DigitalOcean based on reasons.
+    - [X]  Manually deploy to system.
+    - [X]  Create an instance to run on programatically.
+    - [ ]  Configure an instance programatically.
+    - [ ]  Create VMTest target that spins up, runs tests, and spins down.
+    - [ ]  Create VMRun target that spins up, and runs a server.
+    - [ ]  Create VMKill target that destroys all instances.
+    - [ ]  Create VMUpdate target that hits an instance, updates to git, and restarts.
+    
   4.  Design hard spot
     - [ ]  Make the prompt object data structure and algorithms.
     - [ ]  Make the prompt option and explanation structure and algorithms.
