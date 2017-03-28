@@ -5,3 +5,4 @@ node_modules
 babel_cache
 bundle.js
 *.map
+private_*
