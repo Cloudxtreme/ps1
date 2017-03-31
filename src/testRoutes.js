@@ -1,4 +1,3 @@
-import React from 'react';
 import express from 'express';
 import request from 'supertest';
 
@@ -14,8 +13,10 @@ function gets(page) {
   });
 }
 
-gets('/');
-gets('/credits');
-gets('/lesson');
-gets('/popular');
-gets('/builder');
+describe('Routes', () => {
+  gets('/');
+  gets('/credits');
+  gets('/lesson');
+  gets('/popular');
+  gets('/builder');
+});
