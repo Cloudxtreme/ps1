@@ -1,6 +1,6 @@
 import DO from 'do-wrapper';
 import _ from 'lodash';
-import config from '../private_config';
+import config from '../../private_config';
 
 export default class Ocean {
   constructor() {
