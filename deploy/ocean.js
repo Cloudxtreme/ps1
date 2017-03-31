@@ -31,13 +31,18 @@ export default class Ocean {
   }
 
   destroyDrops(tag = '') {
-    // promise response from destroying all drops matching tag
-    this.getListOfDrops(tag).then((drops) => {
-      const idList = drops.map(drop => drop.id);
-      return this.api.dropletsDelete([idList]);
+    // promise to destroy all drops matching tag.
+    // Annoyingly, the do_wrapper documentation is wrong for when no
+    // tag is passed; only one droplet can then be deleted per call.
+    const promises = [];
+    return this.getListOfDrops(tag).then((drops) => {
+      for (let i = 0; i < drops.length; i += 1) {
+        const idList = drops.map(drop => drop.id);
+        promises.push(this.api.dropletsDelete([idList]));
+      }
+      return Promise.all(promises);
     });
   }
-
 }
 
 // function pCreateNewDroplet(api) {
