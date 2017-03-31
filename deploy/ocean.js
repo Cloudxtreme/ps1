@@ -7,7 +7,7 @@ export default class Ocean {
     this.api = new DO(config.digital_ocean_api, 99);
   }
 
-  getListOfDrops(tag = '') {
+  listOfDrops(tag = '') {
     // promise array of droplets, objects as returned by DigitalOcean.
     const searchTerm = tag ? { tag_name: tag } : '';
 
@@ -35,7 +35,7 @@ export default class Ocean {
     // Annoyingly, the do_wrapper documentation is wrong for when no
     // tag is passed; only one droplet can then be deleted per call.
     const promises = [];
-    return this.getListOfDrops(tag).then((drops) => {
+    return this.listOfDrops(tag).then((drops) => {
       for (let i = 0; i < drops.length; i += 1) {
         const idList = drops.map(drop => drop.id);
         promises.push(this.api.dropletsDelete([idList]));

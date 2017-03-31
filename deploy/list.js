@@ -9,7 +9,7 @@ function line(theChar) {
 const ocean = new Ocean();
 console.log(Array(5).join(line('=')));
 
-ocean.getListOfDrops()
+ocean.listOfDrops()
   .then((drops) => {
     console.log(Ocean.prettyDrops(drops));
   }).catch(err => console.log('error: ', err));

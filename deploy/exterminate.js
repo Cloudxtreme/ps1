@@ -9,13 +9,13 @@ function line(theChar) {
 const ocean = new Ocean();
 console.log(Array(5).join(line('=')));
 
-ocean.getListOfDrops()
+ocean.listOfDrops()
   .then((drops) => {
     console.log('Dropping Old state:');
     console.log(Ocean.prettyDrops(drops));
     return ocean.destroyDrops();
   })
-  .then(() => ocean.getListOfDrops())
+  .then(() => ocean.listOfDrops())
   .then((drops) => {
     console.log('New state:');
     console.log(Ocean.prettyDrops(drops));
