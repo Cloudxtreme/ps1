@@ -1,15 +1,15 @@
-import config from '../private_config';
-import DO from 'do-wrapper';
+import console from 'better-console';
+import Ocean from './ocean';
 
-const api = new DO(config.digital_ocean_api, 99);
 
-api.dropletsGetAll('', (err, res, body) => {
-  // console.log('res  = ', res);
-  console.log('err  = ', err);
-  const drop = res && res.body && res.body.droplets && res.body.droplets[0];
-  if (!drop || res.body.droplets.length != 1 || drop.networks.v4.length != 1) {
-    console.log('got something odd in drops.');
-  } else {
-    console.log(`drop is (${drop.networks.v4[0].ip_address}, ${drop.name}, ${drop.id})`);
-  }
-});
+function line(theChar) {
+  return `${Array(60).join(theChar)}\n`;
+}
+
+const ocean = new Ocean();
+console.log(Array(5).join(line('=')));
+
+ocean.getListOfDrops()
+  .then((drops) => {
+    console.log(Ocean.prettyDrops(drops));
+  }).catch(err => console.log('error: ', err));

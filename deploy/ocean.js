@@ -1,43 +1,44 @@
 import DO from 'do-wrapper';
-import console from 'better-console';
 import _ from 'lodash';
 import config from '../private_config';
 
-
-function getListOfDrops(api, tag = '') {
-  // promise array of droplets, objects as returned by DigitalOcean.
-  const searchTerm = tag ? { tag_name: tag } : '';
-
-  const p = api.dropletsGetAll(searchTerm).then(res => res.body.droplets);
-  return p;
-}
-
-function prettyDrops(drops) {
-  // return string of pretty printed list of drops
-  const count = drops.length;
-  if (count) {
-    const lines = ['Id           IP Address       Name'];
-    for (let i = 0; i < drops.length; i += 1) {
-      const drop = drops[i];
-      const ip = _.get(drop, 'networks.v4[0].ip_address', 'None');
-      lines.push(`${drop.id}     ${_.padEnd(ip, 15)}  ${drop.name}`);
-    }
-    return lines.join('\n');
+export default class Ocean {
+  constructor() {
+    this.api = new DO(config.digital_ocean_api, 99);
   }
-  return 'No drops found.';
+
+  getListOfDrops(tag = '') {
+    // promise array of droplets, objects as returned by DigitalOcean.
+    const searchTerm = tag ? { tag_name: tag } : '';
+
+    const p = this.api.dropletsGetAll(searchTerm).then(res => res.body.droplets);
+    return p;
+  }
+
+  static prettyDrops(drops) {
+    // return string of pretty printed list of drops
+    const count = drops.length;
+    if (count) {
+      const lines = ['Id           IP Address       Name'];
+      for (let i = 0; i < drops.length; i += 1) {
+        const drop = drops[i];
+        const ip = _.get(drop, 'networks.v4[0].ip_address', 'None');
+        lines.push(`${drop.id}     ${_.padEnd(ip, 15)}  ${drop.name}`);
+      }
+      return lines.join('\n');
+    }
+    return 'No drops found.';
+  }
+
+  destroyDrops(tag = '') {
+    // promise response from destroying all drops matching tag
+    this.getListOfDrops(tag).then((drops) => {
+      const idList = drops.map(drop => drop.id);
+      return this.api.dropletsDelete([idList]);
+    });
+  }
+
 }
-
-function line(theChar) {
-  return `${Array(60).join(theChar)}\n`;
-}
-
-const api = new DO(config.digital_ocean_api, 99);
-console.log(Array(5).join(line('=')));
-
-getListOfDrops(api)
-  .then((drops) => {
-    console.log(prettyDrops(drops));
-  }).catch(err => console.log('error: ', err));
 
 // function pCreateNewDroplet(api) {
 //   // create a usual dropet, promise the response.
