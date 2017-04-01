@@ -37,13 +37,12 @@ export default class Ocean {
     const promises = [];
     return this.listOfDrops(tag).then((drops) => {
       for (let i = 0; i < drops.length; i += 1) {
-        const idList = drops.map(drop => drop.id);
-        promises.push(this.api.dropletsDelete([idList]));
+        const drop = drops[i];
+        promises.push(this.api.dropletsDelete([drop.id]));
       }
       return Promise.all(promises);
     });
   }
-}
 
 // function pCreateNewDroplet(api) {
 //   // create a usual dropet, promise the response.
