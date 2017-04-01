@@ -4,7 +4,7 @@ import config from '../../private_config';
 
 export default class Ocean {
   constructor() {
-    this.api = new DO(config.digital_ocean_api, 99);
+    this.api = new DO(config.digitalOceanAPI, 99);
   }
 
   listOfDrops(tag = '') {
