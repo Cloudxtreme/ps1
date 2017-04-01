@@ -44,6 +44,11 @@ export default class Ocean {
     });
   }
 
+  destroyDrop(id) {
+    // promise to destory one drop by id.
+    return this.api.dropletsDelete([id]);
+  }
+
 // function pCreateNewDroplet(api) {
 //   // create a usual dropet, promise the response.
 //   const spec = {
