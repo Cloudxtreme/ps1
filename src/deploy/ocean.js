@@ -49,6 +49,27 @@ export default class Ocean {
     return this.api.dropletsDelete([id]);
   }
 
+  createDrop(name, tag) {
+    // promise to create a drop.
+    if (!name || !tag) {
+      return Promise.reject(new Error('Name and Tag are required.'));
+    }
+    const spec = {
+      name,
+      region: 'sfo2',
+      size: '2gb',
+      image: 'ubuntu-16-10-x64', // 'ubuntu-16-10-x64',
+      ssh_keys: [config.digitalOceanPubkeyId],
+      backups: false,
+      ipv6: true,
+      user_data: null,
+      private_networking: null,
+      volumes: null,
+      tags: [tag],
+    };
+    return this.api.dropletsCreate(spec);
+  }
+}
 // function pCreateNewDroplet(api) {
 //   // create a usual dropet, promise the response.
 //   const spec = {
