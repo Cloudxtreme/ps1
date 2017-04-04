@@ -13,13 +13,12 @@ describe('Ocean Interface', function oceanInterface() {
     it('should have no drops with an odd tag', () => ocean.listOfDrops('FOO9876').should.eventually.have.length(0));
   });
 
-  describe('Try to ask for a pretty list of drops', function () {
+  describe('Try to ask for a pretty list of drops', function prettyDropTest() {
     it('accept a call without a tag', () => ocean.prettyListOfDrops().should.eventually.be.fulfilled);
     it('accept a call with a tag', () => ocean.prettyListOfDrops('ps1').should.eventually.be.fulfilled);
-    it('should have no drops with an odd tag', function () {
+    it('should have no drops with an odd tag', function nodrops() {
       const p = ocean.prettyListOfDrops('FOO9876');
-      expect('foobar').to.contain('ob');
-      assert(p.should.eventually.contain('No drops');
+      assert(p.should.eventually.contain('No drops'));
       // p.should.eventually.be;
       p.then((e, r) => console.log('drops', e, r));
     });
