@@ -30,6 +30,11 @@ export default class Ocean {
     return 'No drops found.';
   }
 
+  prettyListOfDrops(tag = '') {
+    // promise a multiline string of the list of drops.
+    return this.listOfDrops(tag).then(drops => Ocean.prettyDrops(drops));
+  }
+
   destroyDrops(tag = '') {
     // promise to destroy all drops matching tag.
     // Annoyingly, the do_wrapper documentation is wrong for when no
