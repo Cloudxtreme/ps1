@@ -15,6 +15,32 @@ export default class Ocean {
     return p;
   }
 
+/*
+  completeAction(action, ...parameters) {
+    // promise action when DigitalOcean side is complete.  That is, to do
+    // action with parameters given in context, get a result that includes an
+    // actionId, wait until that actionId is marked completed, and then return
+    // the result.
+
+    const timeoutToComplete = 90 * 1000;
+      // it may take digital ocean a long time to
+      // configure a new drop or remove something.
+
+    const p = action(context, ...parameters);
+    p.then((res) => {
+      const actionLink = _.get(res, "links.actions[0].id");
+      if (!actionLink) return Promise.reject('Action completed, but with no actionLink Found');
+      if (_.get(res, "links.actions.length", 0) > 1) {
+        return Promise.reject("Action returned multiple action links.  Failing.");
+      }
+      while (true) {
+        api.accountGetAction(actionId)
+        .then(
+    })
+    .catch(err => err)  // explicitly propogate the error from the action.
+}
+*/
+
   static prettyDrops(drops) {
     // return string of pretty printed list of drops
     const count = drops.length;
