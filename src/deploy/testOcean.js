@@ -6,13 +6,25 @@ import Ocean from './ocean';
 
 const ocean = new Ocean();
 
-describe('Ocean Interface', function done() {
-  this.slow(5000); // slow as a dog.
-  describe('Try to ask for drops', () => {
+describe('Ocean Interface', function oceanInterface() {
+  describe('Try to ask for drops', function tryList() {
     it('accept a listOfDrops call without a tag', () => ocean.listOfDrops().should.eventually.be.fulfilled);
     it('accept a listOfDrops with a tag', () => ocean.listOfDrops('ps1').should.eventually.be.fulfilled);
     it('should have no drops with an odd tag', () => ocean.listOfDrops('FOO9876').should.eventually.have.length(0));
   });
+
+  describe('Try to ask for a pretty list of drops', function () {
+    it('accept a call without a tag', () => ocean.prettyListOfDrops().should.eventually.be.fulfilled);
+    it('accept a call with a tag', () => ocean.prettyListOfDrops('ps1').should.eventually.be.fulfilled);
+    it('should have no drops with an odd tag', function () {
+      const p = ocean.prettyListOfDrops('FOO9876');
+      expect('foobar').to.contain('ob');
+      assert(p.should.eventually.contain('No drops');
+      // p.should.eventually.be;
+      p.then((e, r) => console.log('drops', e, r));
+    });
+  });
+
   const testTag = `test${Math.floor((Math.random() * 100) + 100)}`;
   console.log(`Test tag is ${testTag}`);
   describe('Make an instance and destroy it', () => {
