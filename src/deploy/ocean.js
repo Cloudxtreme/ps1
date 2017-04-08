@@ -1,6 +1,11 @@
+/* ocean.js -- My wrapper for DigitalOcean (DO) calls */
 import DO from 'do-wrapper';
 import _ from 'lodash';
+import console from 'better-console';
+import 'source-map-support/register';
 import config from '../../private_config';
+import d from '../logging';
+import line from '../junkDrawer';
 
 export default class Ocean {
   constructor() {
@@ -15,31 +20,65 @@ export default class Ocean {
     return p;
   }
 
-/*
-  completeAction(action, ...parameters) {
-    // promise action when DigitalOcean side is complete.  That is, to do
-    // action with parameters given in context, get a result that includes an
-    // actionId, wait until that actionId is marked completed, and then return
-    // the result.
+  complete(aPromise) {
+    // delay promise chain until DigitalOcean's action is marked
+    // completed.  This does require actively polling DigitalOcean.
+    //
+    // reject if:
+    //     no ActionId,
+    //     more than one action in action list
+    //     all polling attempts fail to receive 'completed' status.
+    // other fulfill with the original result passed to it.
 
-    const timeoutToComplete = 90 * 1000;
-      // it may take digital ocean a long time to
-      // configure a new drop or remove something.
+    function isActionDone(result) {
+      const status = _.get(result, 'body.action.status');
+      const complete = status === 'completed';
+      d('Action status returned ', status, ' or ', complete);
+      return complete;
+    }
 
-    const p = action(context, ...parameters);
-    p.then((res) => {
-      const actionLink = _.get(res, "links.actions[0].id");
-      if (!actionLink) return Promise.reject('Action completed, but with no actionLink Found');
-      if (_.get(res, "links.actions.length", 0) > 1) {
-        return Promise.reject("Action returned multiple action links.  Failing.");
+    function getActionId(result) {
+      // return actionId or Error from a result body.
+      const actions = _.get(result, 'body.links.actions');
+      if (!actions) {
+        d("Can't find links.actions");
+        // console.dir(result);
+        return new Error('No .links found.');
       }
-      while (true) {
-        api.accountGetAction(actionId)
-        .then(
-    })
-    .catch(err => err)  // explicitly propogate the error from the action.
-}
-*/
+      if (actions.length !== 1) {
+        d('links.actions wrong length');
+        console.dir(result);
+        return new Error('.links.actions was not length 1');
+      }
+      const actionId = _.get(actions, '[0].id');
+      if (!actionId) {
+        d('No action id.');
+        console.dir(result);
+        return new Error('No actionId found');
+      }
+      d('actionId = ', actionId);
+      return actionId;
+    }
+
+    const retryDelays = [1000, 3000, 2000];
+    debugger;
+
+    d(line('-'));
+    d('aPromise = ', aPromise);
+    d('retryDelays = ', retryDelays);
+    let theResult;
+    return aPromise
+      .then((result) => { theResult = result; return getActionId(result); })
+      .then((actionId) => {
+        poll(
+          [1000, 1000, 1000, 1000, 1000, 1000],
+          "Action requested, but DigitalOcean did mark as 'complete'",
+          () => this.api.accountGetAction(actionId),
+          isActionDone);
+      })
+      .then(() => theResult)
+      .catch((err) => { d('error ', err); return err; });
+  }
 
   static prettyDrops(drops) {
     // return string of pretty printed list of drops
@@ -81,7 +120,7 @@ export default class Ocean {
   }
 
   createDrop(name, tag) {
-    // promise to create a drop.
+    // promise to create a drop; promise returns result from DO.
     if (!name || !tag) {
       return Promise.reject(new Error('Name and Tag are required.'));
     }
@@ -100,4 +139,59 @@ export default class Ocean {
     };
     return this.api.dropletsCreate(spec);
   }
+}
+
+function poll(retryDelays, errorMessage, polledPromise, isDoneFn) {
+  // isDoneFn returns true if done or false if more polling needed
+  // polledPromise resolves to a value passed to the isDoneFn
+  // Fulfills with result from polledPromise or
+  // Rejects if out of polling times or polledPromise rejects.
+
+  function wait(delayMs, value) {
+    // promise fulfills with value after delay time (in milliseconds)
+    return new Promise((resolve) => {
+      d('setting timeout');
+      setTimeout(() => resolve(value), delayMs);
+    });
+  }
+
+  function recursivePoll() {
+    d('In recursivePoll:');
+    const delay = retryDelays.shift();
+    d('   delay: ', delay);
+    if (_.isUndefined(delay)) {
+      return Error(errorMessage);
+    }
+    return wait(delay)
+      .then(polledPromise)
+      .then((result) => {
+        if (isDoneFn(result)) {
+          return result;
+        }
+        return recursivePoll();
+      });
+  }
+
+  d('In poll:');
+  d('   retryDelays: ', retryDelays);
+  return recursivePoll();
+}
+
+if (true || require.main === 'module') {
+  //-----
+  console.log('starting');
+  const ocean = new Ocean();
+  const p1 = ocean.createDrop('random', 'junk');
+  const p2 = ocean.complete(p1, 3);
+  line('.');
+
+  p2.then(
+    (val) => { d('resolved with'); console.dir(val); })
+  .catch(
+    (err) => { d('rejected with ', err); },
+  );
+
+  p1.then((res) => { d('original drop was '); console.dir(res); });
+  d('This program is gratified to be of use.');
+  console.trace();
 }

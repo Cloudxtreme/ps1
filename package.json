@@ -32,7 +32,9 @@
     "jshint": "*",
     "mocha": "*",
     "mustache": "*",
+    "node-inspector": "^1.0.0",
     "should": "^11.2.1",
+    "source-map-support": "^0.4.14",
     "supertest": "^3.0.0",
     "webpack-dev-server": "^2.4.2"
   },
