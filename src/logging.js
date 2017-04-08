@@ -1,22 +1,14 @@
 // Logging functions, notably t() for tracing.
-import console from 'better-console';
+import chalk from 'chalk';
 
 // export t = con.info;
 export default function d(...params) {
-  console.info(...params);
+  console.log(chalk.cyan(...params));
 }
 
-//
-// //const testing = (process.env.NODE_ENV !== 'production');
-// export const t = testing ? trace : (() => {});  // only output in production
-//
-// const trace = console.trace;
-//
-// // TODO how to do env
-// const timeOfFirstCall = 0; // TODO:  find time of now.
-//   // TODO:  JavaScript global singleton.
-//  // nice interface, export 'logger' and helper functions c, t, etc.?
-//
-//    // time mark in green.   Message, indent?
-//    // TODO:  JavaScript have a with statement to do the indents?
-//    // TODO:  What does JavaScript use tildes for?
+/* TODO in the far future:
+   Add really good promise() wrapping for debugging.
+   Make sure debugging is off if (process.env.NODE_ENV !== 'production')
+   Add a timestamp to debugging.
+   See if I can differentiate the current thread.
+   Make it prettier. */
