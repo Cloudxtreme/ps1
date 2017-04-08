@@ -1,10 +1,7 @@
 import console from 'better-console';
 import Ocean from './ocean';
+import line from '../junkDrawer';
 
-
-function line(theChar) {
-  return `${Array(60).join(theChar)}\n`;
-}
 
 const ocean = new Ocean();
 console.log(Array(5).join(line('=')));
