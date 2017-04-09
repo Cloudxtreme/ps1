@@ -1,23 +1,14 @@
 /* ocean.js -- My wrapper for DigitalOcean (DO) calls */
 import DO from 'do-wrapper';
 import _ from 'lodash';
-import console from 'better-console';
-import 'source-map-support/register';
+import 'source-map-support/register';   // hack for sourcemaps
 import config from '../../private_config';
 import d from '../logging';
-import line from '../junkDrawer';
+import { line, poll } from '../junkDrawer';
 
 export default class Ocean {
   constructor() {
     this.api = new DO(config.digitalOceanAPI, 99);
-  }
-
-  listOfDrops(tag = '') {
-    // promise array of droplets, objects as returned by DigitalOcean.
-    const searchTerm = tag ? { tag_name: tag } : '';
-
-    const p = this.api.dropletsGetAll(searchTerm).then(res => res.body.droplets);
-    return p;
   }
 
   complete(aPromise) {
@@ -31,57 +22,46 @@ export default class Ocean {
     // other fulfill with the original result passed to it.
 
     function isActionDone(result) {
-      const status = _.get(result, 'body.action.status');
-      const complete = status === 'completed';
-      d('Action status returned ', status, ' or ', complete);
-      return complete;
+      return _.get(result, 'body.action.status') === 'completed';
     }
 
     function getActionId(result) {
       // return actionId or Error from a result body.
       const actions = _.get(result, 'body.links.actions');
-      if (!actions) {
-        d("Can't find links.actions");
-        // console.dir(result);
-        return new Error('No .links found.');
-      }
-      if (actions.length !== 1) {
-        d('links.actions wrong length');
-        console.dir(result);
-        return new Error('.links.actions was not length 1');
-      }
+      if (!actions) return new Error('No .actions found.');
+      if (actions.length !== 1) return new Error('.actions length was not 1');
       const actionId = _.get(actions, '[0].id');
-      if (!actionId) {
-        d('No action id.');
-        console.dir(result);
-        return new Error('No actionId found');
-      }
-      d('actionId = ', actionId);
+      if (!actionId) return new Error('No actionId found');
       return actionId;
     }
 
-    const retryDelays = [1000, 3000, 2000];
-    debugger;
-
+    const retryDelays = [3000, 9000, 12000, 12000];
+    let aResult;
     d(line('-'));
-    d('aPromise = ', aPromise);
-    d('retryDelays = ', retryDelays);
-    let theResult;
     return aPromise
-      .then((result) => { theResult = result; return getActionId(result); })
+      .then((result) => { aResult = result; return getActionId(result); })
       .then((actionId) => {
         poll(
-          [1000, 1000, 1000, 1000, 1000, 1000],
+          retryDelays,
           "Action requested, but DigitalOcean did mark as 'complete'",
           () => this.api.accountGetAction(actionId),
           isActionDone);
       })
-      .then(() => theResult)
+      .then(() => aResult)
       .catch((err) => { d('error ', err); return err; });
+  }
+
+  listOfDrops(tag = '') {
+    // promise array of droplets, objects as returned by DigitalOcean.
+    const searchTerm = tag ? { tag_name: tag } : '';
+
+    const p = this.api.dropletsGetAll(searchTerm).then(res => res.body.droplets);
+    return p;
   }
 
   static prettyDrops(drops) {
     // return string of pretty printed list of drops
+    // TODO:  sub in 'not completed' for errors?
     const count = drops.length;
     if (count) {
       const lines = ['Id           IP Address       Name'];
@@ -141,44 +121,8 @@ export default class Ocean {
   }
 }
 
-function poll(retryDelays, errorMessage, polledPromise, isDoneFn) {
-  // isDoneFn returns true if done or false if more polling needed
-  // polledPromise resolves to a value passed to the isDoneFn
-  // Fulfills with result from polledPromise or
-  // Rejects if out of polling times or polledPromise rejects.
-
-  function wait(delayMs, value) {
-    // promise fulfills with value after delay time (in milliseconds)
-    return new Promise((resolve) => {
-      d('setting timeout');
-      setTimeout(() => resolve(value), delayMs);
-    });
-  }
-
-  function recursivePoll() {
-    d('In recursivePoll:');
-    const delay = retryDelays.shift();
-    d('   delay: ', delay);
-    if (_.isUndefined(delay)) {
-      return Error(errorMessage);
-    }
-    return wait(delay)
-      .then(polledPromise)
-      .then((result) => {
-        if (isDoneFn(result)) {
-          return result;
-        }
-        return recursivePoll();
-      });
-  }
-
-  d('In poll:');
-  d('   retryDelays: ', retryDelays);
-  return recursivePoll();
-}
-
-if (true || require.main === 'module') {
-  //-----
+function foo() {
+  // testing code.
   console.log('starting');
   const ocean = new Ocean();
   const p1 = ocean.createDrop('random', 'junk');
@@ -195,3 +139,9 @@ if (true || require.main === 'module') {
   d('This program is gratified to be of use.');
   console.trace();
 }
+
+if (require.main === 'module') {   // note this breaks for debugger
+  foo();
+}
+console.log('starting...');
+console.log(require.main);
