@@ -41,6 +41,7 @@
     "describe": true,
     "it": true,
     "window": true,
-    "document": true
+    "document": true,
+    "process": true
   }
 }

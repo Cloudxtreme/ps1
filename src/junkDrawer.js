@@ -8,6 +8,13 @@ the junk drawer, but is it worth it?
 import _ from 'lodash';
 import d from './logging';
 
+
+export function nodeReportUnhandledPromises() {
+  process.on('unhandledRejection', (err, promise) => {
+    console.error('Unhandled rejection (promise: ', promise, ', reason: ', err, ').');
+  });
+}
+
 export default function line(theChar) {
   return `${Array(60).join(theChar)}\n`;
 }
