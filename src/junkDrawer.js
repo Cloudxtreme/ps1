@@ -22,7 +22,7 @@ export function line(theChar) {
 export function wait(delayMs, value) {
   // promise fulfills with value after delay time (in milliseconds)
   return new Promise((resolve) => {
-    d('setting timeout');
+    d('wait:  setting timeout of ', delayMs);
     setTimeout(() => resolve(value), delayMs);
   });
 }
