@@ -15,7 +15,7 @@ export function nodeReportUnhandledPromises() {
   });
 }
 
-export default function line(theChar) {
+export function line(theChar) {
   return `${Array(60).join(theChar)}\n`;
 }
 
