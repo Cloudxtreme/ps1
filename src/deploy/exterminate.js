@@ -1,6 +1,6 @@
 import console from 'better-console';
 import Ocean from './ocean';
-import line from '../junkDrawer';
+import { line } from '../junkDrawer';
 
 
 const ocean = new Ocean();

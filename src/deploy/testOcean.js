@@ -18,8 +18,7 @@ describe('Ocean Interface', function oceanInterface() {
     it('accept a call with a tag', () => ocean.prettyListOfDrops('ps1').should.eventually.be.fulfilled);
     it('should have no drops with an odd tag', function nodrops() {
       const p = ocean.prettyListOfDrops('FOO9876');
-      assert(p.should.eventually.contain('No drops'));
-      // p.should.eventually.be;
+      p.should.eventually.match('No drops');
       p.then((e, r) => console.log('drops', e, r));
     });
   });

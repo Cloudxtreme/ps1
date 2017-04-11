@@ -11,6 +11,51 @@ export default class Ocean {
     this.api = new DO(config.digitalOceanAPI, 99);
   }
 
+  allActionsComplete(toCheck = 5) {
+    // delay promise chain until DigitalOcean reports that last
+    // actions are complete.   This does require polling DigitalOcean.
+    const that = this;  // thought we over this hack.
+
+    function getPagesOfActions(totalActions) {
+      // return promise of getting all DO action pages needed to
+      // check the last `toCheck` actions out of a total `totalActions`
+      //
+      // Math attack to get right pages to grab from digitalOcean.
+      // let P = number of actions per perPage,
+      // let T = total actions
+      // let C = number of actions to check.
+      // let F = first action to check, = T - C + 1
+      // Results on page n, given P. range from (n-1)*P + 1 to last one at
+      //    n*P
+      // So pages needed are first page [ceil (F/P)]
+      //  to last page ceil(T/P).
+      // E.g., (C,P,T) = (5, 10, 17) => page 2 only, having actions 13 to 17
+      // or = (14, 10, 161) => pages ceil((T-C+1)/P) to ceil(T/P)
+      //    = ceil((161-14+1)/10) to ceil(161/10) = ceil(14.8) to ceil(16.1)
+      //    = pages 15 to 17 will have actions including the last 14.
+
+      if (!totalActions) return new Error("Can't find number of actions.");
+
+      const perPage = 25; // DigitalOcean has hard limit of 200.
+      const promises = [];
+      for (let i = Math.ceil(((totalActions - toCheck) + 1) / perPage);
+          i <= Math.ceil(totalActions / perPage); i += 1) {
+        const p = that.api.accountGetActions({ perPage, pageNumber: i });
+        promises.push(p);
+      }
+      return Promise.all(promises);
+    }
+
+    this.api.accountGetActions({ per_page: 1 })  // get first action
+    .then(res => _.get(res, 'meta.total'))     // find number of actions from meta
+    .then(getPagesOfActions)
+    .then((res) => {
+      d('got pages back');
+      console.dir(res);
+    })
+    .catch(err => console.error(err));
+  }
+
   complete(aPromise) {
     // delay promise chain until DigitalOcean's action is marked
     // completed.  This does require actively polling DigitalOcean.
@@ -35,7 +80,7 @@ export default class Ocean {
       return actionId;
     }
 
-    const retryDelays = [3000, 9000, 12000, 12000];
+    const retryDelays = [3000, 9000, 12000, 14000];
     let aResult;
     d(line('-'));
     return aPromise
@@ -127,21 +172,22 @@ function foo() {
   const ocean = new Ocean();
   const p1 = ocean.createDrop('random', 'junk');
   const p2 = ocean.complete(p1, 3);
-  line('.');
-
-  p2.then(
-    (val) => { d('resolved with'); console.dir(val); })
+  p2.then((val) => {
+    d('foo: create/complete resolved with'); console.dir(val);
+    ocean.prettyListOfDrops().then(res => console.log(res));
+  })
   .catch(
-    (err) => { d('rejected with ', err); },
+    (err) => { d('foo: create/complete rejected with ', err); },
   );
+  line('.');
+  const p3 = p2.then(() => ocean.destroyDrops());
+  const p4 = p3.then(ocean.allActionsComplete);
+  p4.then(v => console.log('v = ', v))
+  .catch(e => console.error('foo: allActionsComplete err = ', e));
 
-  p1.then((res) => { d('original drop was '); console.dir(res); });
+  // p1.then((res) => { d('original drop was '); console.dir(res); });
   d('This program is gratified to be of use.');
-  console.trace();
 }
 
-if (require.main === 'module') {   // note this breaks for debugger
-  foo();
-}
-console.log('starting...');
-console.log(require.main);
+// if (require.main === 'module') {   // note this breaks for debugger
+foo();

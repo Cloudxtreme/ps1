@@ -23,7 +23,10 @@ export function wait(delayMs, value) {
   // promise fulfills with value after delay time (in milliseconds)
   return new Promise((resolve) => {
     d('wait:  setting timeout of ', delayMs);
-    setTimeout(() => resolve(value), delayMs);
+    setTimeout(() => {
+      d('wait:  finished timeout of ', delayMs);
+      resolve(value);
+    }, delayMs);
   });
 }
 
@@ -38,15 +41,17 @@ export function poll(retryDelays, errorMessage, polledPromise, isDoneFn) {
     if (_.isUndefined(delay)) {
       return Error(errorMessage);
     }
+    d('recursive poll:  delay is', delay);
     return wait(delay)
       .then(polledPromise)
       .then((result) => {
         if (isDoneFn(result)) {
+          console.log('poll:  returning');
           return result;
         }
         return recursivePoll();  // tail-end recursion for Promises
       });
   }
-  d('In poll with retryDelays: ', retryDelays);
+  d('poll:  calling recursive with retryDelays: ', retryDelays);
   return recursivePoll();
 }
