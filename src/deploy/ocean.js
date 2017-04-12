@@ -5,6 +5,7 @@ import 'source-map-support/register';   // hack for sourcemaps
 import config from '../../private_config';
 import d from '../logging';
 import { line, poll } from '../junkDrawer';
+import { pro } from '../prolog';
 
 export default class Ocean {
   constructor() {
@@ -170,7 +171,8 @@ function foo() {
   // testing code.
   console.log('starting');
   const ocean = new Ocean();
-  const p1 = ocean.createDrop('random', 'junk');
+  const p1 = pro(ocean.createDrop('random', 'junk'));
+  p1.catch(() => console.log('meh.'));
   const p2 = ocean.complete(p1, 3);
   p2.then((val) => {
     d('foo: create/complete resolved with'); console.dir(val);
@@ -185,9 +187,9 @@ function foo() {
   p4.then(v => console.log('v = ', v))
   .catch(e => console.error('foo: allActionsComplete err = ', e));
 
-  // p1.then((res) => { d('original drop was '); console.dir(res); });
+  p1.then((res) => { d('original drop was '); console.dir(res); });
   d('This program is gratified to be of use.');
 }
 
 // if (require.main === 'module') {   // note this breaks for debugger
-foo();
+// foo();
