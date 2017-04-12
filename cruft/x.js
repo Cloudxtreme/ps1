@@ -1,25 +1,21 @@
 import console from 'better-console';
 import { nodeReportUnhandledPromises, wait, line } from '../src/junkDrawer';
-// import d from '../src/logging';
 
-function dp(...params) {
-  // return a new debuggable promise,
-  // call like:  `dp().then(thing)...`;
-  return new DebugPromise(...params);
+function pro(...params) {
+  // return a new Prolog promise,
+  // call like:  `pro().then(thing)...`;
+  return new Prolog(...params);
 }
 
 let nextId = 1;
 let nextGroup = 0;
 const groupIds = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-const plist = {};
 
-
-function hp(msg) {
+function proOut(msg) {
   console.log('prolog: ', msg);
-  // set to history?
 }
 
-class DebugPromise {
+class Prolog {
   constructor(p, group, text) {
     this.p = p || Promise.resolve('no argument');
     if (group) {
@@ -29,46 +25,40 @@ class DebugPromise {
       nextGroup += 1;
     }
     this.id = this.group + nextId.toString();
-    if (group) {
-      hp(`${text}${this.id}`);
-    } else if (p) {
-      hp(`new ${this.id} chain from argument`);
-    } else {
-      hp(`new ${this.id} chain`);
-    }
-    plist[this.id] = { pobj: this.p, group: this.group };
     nextId += 1;
-    // hprint(this.id);
+    if (group) {
+      proOut(`${text}${this.id}`);
+    } else if (p) {
+      proOut(`new ${this.id} chain from argument`);
+    } else {
+      proOut(`new ${this.id} chain`);
+    }
   }
 
   then(...params) {
     const p1 = this.p.then(...params);
-    const p2 = dp(p1, this.group, `(${this.id}).then new `);
-    plist[this.id].history = `then -> ${p2.id}`;
+    const p2 = pro(p1, this.group, `(${this.id}).then new `);
     p1.then(
-      () => { hp(`${p2.id} fulfills`); },
-      () => { hp(`${p2.id} rejects`); });
+      () => { proOut(`${p2.id} fulfills`); },
+      () => { proOut(`${p2.id} rejects`); });
     return p2;
   }
 
   catch(...params) {
     const p1 = this.p.catch(...params);
-    const p2 = dp(p1, this.group, `(${this.id}).catch new `);
-    plist[this.id].history = `catch ->  ${p2.id}`;
+    const p2 = pro(p1, this.group, `(${this.id}).catch new `);
     p1.then(
-      () => { hp(`${p2.id} fulfills`); },
-      () => { hp(`${p2.id} rejects`); });
+      () => { proOut(`${p2.id} fulfills`); },
+      () => { proOut(`${p2.id} rejects`); });
     return p2;
   }
 }
 
 
 function f5() {
-  dp().then(() => wait(1000)).then(() => wait(500)).then(() => 'done');
+  pro().then(() => wait(1000)).then(() => wait(500)).then(() => 'done');
   console.log('2......');
-  dp(wait(1200)).then(() => wait(500));
-  // wait(5000).then(hprint);
-  //  hprint();
+  pro(wait(1200)).then(() => wait(500));
 }
 
 function f1() {
