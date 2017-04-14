@@ -49,6 +49,7 @@
     "react-bootstrap": "^0.30.8",
     "react-dom": "^15.4.2",
     "react-router": "^3.0.2",
+    "simple-ssh": "^0.9.0",
     "source-map-support": "^0.4.14",
     "webpack": "^2.3.0"
   }
