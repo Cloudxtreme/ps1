@@ -1,12 +1,19 @@
 /* Really basic JavaScript tests, to see if mocha is running */
+/* eslint-disable func-names */
+import should from 'should';
+
 const assert = require('assert');
-require('should');  // side effect is to modify object with 'should' getter.
 
 function four() {
   return 1 + 1 + 1 + 1;
 }
+function exceptFour(input) {
+  // return input, but throw an error on a four.
+  if (input === 4) throw new Error('four is an error');
+  return input;
+}
 
-describe('Basic Sanity Test', () => {
+describe('Basic Sanity Tests', () => {
   describe('different ways to test', () => {
     it('should count to 4 without crashing', () => 1 + 1 + 1 + 1);
     it('should assert within a named function', function count() {
@@ -28,6 +35,35 @@ describe('Basic Sanity Test', () => {
     it('should check substrings', () => {
       'Good morning!'.should.match(/morning/);
       ''.should.not.match(/morning/);
+    });
+  });
+  describe('about exceptions', function () {
+    it('catch simple errors', function () {
+      /* eslint-disable no-undef */
+      assert.throws(() => x.y.z, ReferenceError);
+      assert.throws(() => x.y.z, ReferenceError, /is not defined/);
+      assert.throws(() => x.y.z, /is not defined/);
+      assert.doesNotThrow(() => 3 * 4);
+      assert.doesNotThrow(() => 3 * 4, ReferenceError);
+      assert.doesNotThrow(() => 3 * 4, /is not defined/);
+      assert.doesNotThrow(() => 3 * 4, EvalError);
+      should.throws(() => x.y.z, ReferenceError);
+      should.throws(() => x.y.z, ReferenceError, /is not defined/);
+      should.throws(() => x.y.z, /is not defined/);
+      should.doesNotThrow(() => 3 * 4);
+      should.doesNotThrow(() => 3 * 4, ReferenceError);
+      should.doesNotThrow(() => 3 * 4, /is not defined/);
+      should.doesNotThrow(() => 3 * 4, EvalError);
+    });
+    it('should without chai echo', function () {
+      exceptFour(3).should.equal(3);
+      exceptFour('a').should.equal('a');
+    });
+    it('should correctly catch without chai', function () {
+      assert.throws(() => exceptFour(4));
+      should.throws(() => exceptFour(4));
+      should.throws(() => exceptFour(4), /is an error/);
+      should.throws(() => exceptFour(4), Error);
     });
   });
 });
