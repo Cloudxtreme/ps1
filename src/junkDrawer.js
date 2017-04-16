@@ -8,6 +8,17 @@ the junk drawer, but is it worth it?
 import _ from 'lodash';
 import d from './logging';
 
+// mochaAsync from http://staxmanade.com/2015/11/testing-asyncronous-code-with-mochajs-and-es7-async-await/
+export function mochaAsync(fn) {
+  return async (done) => {
+    try {
+      await fn();
+      done();
+    } catch (err) {
+      done(err);
+    }
+  };
+}
 
 export function nodeReportUnhandledPromises() {
   process.on('unhandledRejection', (err, promise) => {
