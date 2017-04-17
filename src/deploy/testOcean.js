@@ -4,6 +4,7 @@ import 'should';
 import Ocean from './ocean';
 
 const ocean = new Ocean();
+const testTag = 'testing';
 
 describe('Ocean Drops Interface', function () {
   this.timeout(60000);
@@ -19,7 +20,10 @@ describe('Ocean Drops Interface', function () {
   });
 
   describe('exterminate/create/destroy/list cycle', function () {
-    it('should exterminate existing tests and have none');
+    it('should exterminate existing tests and have none', async () => {
+      await ocean.destroyDrops(testTag);
+      ocean.listDrops().should.eventually.have.length(0);
+    });
     it('should create a drop and find it');
     it('should destroy a drop and not find it');
     it('should create a drop and find it');

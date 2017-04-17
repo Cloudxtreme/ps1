@@ -4,7 +4,7 @@ import _ from 'lodash';
 // import console from 'better-console';
 import 'source-map-support/register';   // hack for sourcemaps
 import config from '../../private_config';
-// import d from '../logging';
+import d from '../nologging';
 import { wait } from '../junkDrawer';
 
 export default class Ocean {
@@ -55,18 +55,20 @@ export default class Ocean {
     return (lines + moreLines).join('\n');
   }
 
-  destroyDrops(tag = '') {
-    // promise to destroy all drops matching tag.
+  async destroyDrops(tag = '') {
+    // promise to destroy all drops matching tag, waiting until action is done.
     // Annoyingly, the do_wrapper documentation is wrong for when no
     // tag is passed; only one droplet can then be deleted per call.
+    const drops = await this.listDrops(tag);
+    d('drops founds', drops);
     const promises = [];
-    return this.listOfDrops(tag).then((drops) => {
-      for (let i = 0; i < drops.length; i += 1) {
-        const drop = drops[i];
-        promises.push(this.api.dropletsDelete([drop.id]));
-      }
-      return Promise.all(promises);
-    });
+    for (let i = 0; i < drops.length; i += 1) {
+      promises.push(this.api.dropletsDelete([drops[i].id]));
+    }
+    const results = await Promise.all(promises);
+    console.log('destroying list is', results);
+    console.log('await actions');
+    return drops.length;
   }
 
   destroyDrop(id) {
@@ -74,7 +76,7 @@ export default class Ocean {
     return this.api.dropletsDelete([id]);
   }
 
-  createDrop(name, tag) {
+  createDrop(tag, name) {
     // promise to create a drop; promise returns result from DO.
     if (!name || !tag) {
       return Promise.reject(new Error('Name and Tag are required.'));
