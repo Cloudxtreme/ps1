@@ -1,7 +1,6 @@
-// Logging functions, notably t() for tracing.
+// Logging functions
 import chalk from 'chalk';
 
-// export t = con.info;
 export default function d(...params) {
   console.log(chalk.cyan(...params));
 }
