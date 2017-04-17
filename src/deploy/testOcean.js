@@ -1,8 +1,7 @@
 /* eslint-disable func-names */
 
-import should from 'should';
+import 'should';
 import Ocean from './ocean';
-import { mochaAsync } from '../junkDrawer';
 
 const ocean = new Ocean();
 
@@ -14,8 +13,9 @@ describe('Ocean Drops Interface', function () {
     it('should have no drops with an odd tag', () =>
       ocean.listDrops().should.eventually.have.length(0));
     it('should have no pretty drops with an odd tag', () =>
-      ocean.prettyListDrops(oddTag).should.eventually.match('No drops'));
-    it('should not crash when no tag', ocean.prettyListDrops);
+      ocean.prettyListDrops(oddTag).should.eventually.match(/No drops/));
+    it('should not crash when no tag', () =>
+      ocean.prettyListDrops().should.be.fulfilled());
   });
 
   describe('exterminate/create/destroy/list cycle', function () {

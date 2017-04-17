@@ -1,10 +1,10 @@
 /* ocean.js -- My wrapper for DigitalOcean (DO) calls */
 import DO from 'do-wrapper';
 import _ from 'lodash';
-import console from 'better-console';
+// import console from 'better-console';
 import 'source-map-support/register';   // hack for sourcemaps
 import config from '../../private_config';
-import d from '../logging';
+// import d from '../logging';
 import { wait } from '../junkDrawer';
 
 export default class Ocean {
@@ -34,14 +34,10 @@ export default class Ocean {
     // return array of droplet objects, as returned by DigitalOcean.
     const searchTerm = tag ? { tag_name: tag } : '';
     const result = await this.api.dropletsGetAll(searchTerm);
-    d(3);
-    console.dir(result.body);
-    console.dir(_.get(result, 'response.body.droplets', 'no'));
     const droplets = _.get(result, 'response.body.droplets');
     if (_.isUndefined(droplets)) {
       throw new Error(`DigitalOcean result failed to return a droplets field:\n ${result}`);
     }
-    console.dir(droplets);
     return droplets;
   }
 
