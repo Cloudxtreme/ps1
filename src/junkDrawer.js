@@ -32,11 +32,11 @@ export function line(theChar) {
 
 export function wait(delayMs, value) {
   // promise fulfills with value after delay time (in milliseconds)
-  d('wait ', delayMs, ' returns promise');
+  // d('wait ', delayMs, ' returns promise');
   return new Promise((resolve) => {
-    d('wait:  setting timeout of ', delayMs);
+    // d('wait:  setting timeout of ', delayMs);
     setTimeout(() => {
-      d('wait:  finished timeout of ', delayMs);
+      // d('wait:  finished timeout of ', delayMs);
       resolve(value);
     }, delayMs);
   });
