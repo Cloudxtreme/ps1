@@ -6,7 +6,7 @@ the junk drawer, but is it worth it?
 
 */
 import _ from 'lodash';
-import d from './logging';
+import { d } from './logging';
 
 // mochaAsync from http://staxmanade.com/2015/11/testing-asyncronous-code-with-mochajs-and-es7-async-await/
 export function mochaAsync(fn) {

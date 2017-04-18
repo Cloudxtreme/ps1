@@ -4,7 +4,7 @@ import _ from 'lodash';
 // import console from 'better-console';
 import 'source-map-support/register';   // hack for sourcemaps
 import config from '../../private_config';
-import d from '../nologging';
+import { d, ddir } from '../logging';
 import { wait } from '../junkDrawer';
 
 export default class Ocean {

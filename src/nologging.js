@@ -1,3 +1,4 @@
 // Logging functions, but turned off
 
-export default function d(...params) {}  // eslint-disable-line
+export function d() {}
+export function ddir() {}

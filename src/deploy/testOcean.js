@@ -2,6 +2,7 @@
 
 import 'should';
 import Ocean from './ocean';
+import { d } from '../logging';
 
 const ocean = new Ocean();
 const testTag = 'testing';

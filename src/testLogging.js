@@ -1,4 +1,4 @@
-import d from './logging';
+import { d } from './logging';
 
 d('Starting test');
 describe('Logging  the trace function', () => {
