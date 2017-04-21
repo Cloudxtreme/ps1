@@ -57,52 +57,80 @@ export default class Ocean {
     throw new Error(`DigitalOcean failed to complete action ${actionId}`);
   }
 
-  async lastActionIds(number = 2) {
+  async lastActions(number = 2) {
     // return array of last actions
-
     // first, find the last action
-    const result = await this.api.accountGetActions({ per_page: 1, page_number: 250 });
+    const result = await this.api.accountGetActions({ per_page: 1, page: 1 });
     const lastLine = _.get(result, 'body.links.pages.last');
     const lastAction = parseInt(lastLine.match(/page=(.*)&per_page/)[1], 10);
 
-    // be subtle later...
-    const promises = [];
-    for (let i = (lastAction - number) + 1; i <= lastAction; i += 1) {
-      promises.push(this.api.accountGetActions({ per_page: 1, page_number: i }));
-    }
-    const results = await Promise.all(promises);
+    // be efficient later...  either promises or pages
     const actions = [];
-    for (let i = 0; i < results.length; i += 1) {  // yeah, yeah use filter
-      actions.push(_.get(results, `[${i}].body.actions[0]`));
+    for (let i = (lastAction - number) + 1; i <= lastAction; i += 1) {
+      const response = await this.api.accountGetActions({ per_page: 1, page: i });
+      actions.push(response.body.actions[0]);
     }
-
-    d('actions: ', actions);
     return actions;
   }
 
-  async listDrops(tag = '') {
+  async prettyLastActions(number = 2) {
+    const actions = await this.lastActions(number);
+    const lines = ['actionID    status       type            droplet_id   droplet_status'];
+    for (let i = 0; i < actions.length; i += 1) {
+      const action = actions[i];
+      let dStatus = '';
+      let dId = '';
+      // fill in droplet status
+      if (action.resource_type === 'droplet') {
+        dId = action.resource_id;
+        try {
+          const result = await this.api.dropletsGetById(dId);
+          dStatus = _.get(result, 'body.droplet.status');
+        } catch (err) {
+          if (!err.message.match(/The resource you were accessing could not be found./)) {
+            throw err;
+          }
+          // ignore missing droplet, e.g., deleted.
+        }
+      }
+      lines.push(`${action.id}   ${_.padEnd(action.status, 12)} ${_.padEnd(action.type, 15)} ${dId}  ${dStatus}`);
+    }
+    const out = (lines).join('\n');
+    return out;
+  }
+
+
+  }
+
+
+  async listDrops(tag = '', name = '') {
     // return array of droplet objects, as returned by DigitalOcean.
     const searchTerm = tag ? { tag_name: tag } : '';
     const result = await this.api.dropletsGetAll(searchTerm);
-    const droplets = _.get(result, 'response.body.droplets');
+    let droplets = _.get(result, 'response.body.droplets');
     if (_.isUndefined(droplets)) {
       ddir('failed to get droplets field', result);
       throw new Error(`DigitalOcean result failed to return a droplets field:\n ${result}`);
     }
+    if (name) {
+      droplets = _.filter(droplets, drop => drop.name === name);
+    }
     return droplets;
   }
 
-  async prettyListDrops(tag = '') {
+  async prettyListDrops(tag = '', name = '') {
     // return string with pretty printed list of droplets
-    const droplets = await this.listDrops(tag);
+    const droplets = await this.listDrops(tag, name);
     if (droplets.length === 0) {
       return 'No drops found';
     }
-    const lines = ['Id           IP Address       Name'];
+    const lines = ['Id           IP Address       Tag        Name'];
     for (let i = 0; i < droplets.length; i += 1) {
       const drop = droplets[i];
       const ip = _.get(drop, 'networks.v4[0].ip_address', 'None');
-      lines.push(`${drop.id}     ${_.padEnd(ip, 15)}  ${drop.name}  ${drop.status}`);
+      const tags = drop.tags.join(', ');
+      const status = drop.status === 'active' ? '' : drop.status;
+      lines.push(`${drop.id}     ${_.padEnd(ip, 15)}  ${_.padEnd(tags, 10)} ${_.padEnd(drop.name, 10)}  ${status}`);
     }
     const out = (lines).join('\n');
     return out;

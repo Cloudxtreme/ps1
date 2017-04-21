@@ -3,7 +3,7 @@
 import _ from 'lodash';
 import 'should';
 import Ocean from './ocean';
-import { d } from '../logging';
+import { d, ddir } from '../logging';
 
 const ocean = new Ocean();
 const testTag = 'testing';
@@ -14,16 +14,27 @@ describe('Ocean Drops Interface', function () {
   describe('listDrops', function () {
     const oddTag = 'F009876';
     it('should have no drops with an odd tag', () =>
-      ocean.listDrops().should.eventually.have.length(0));
+      ocean.listDrops(oddTag).should.eventually.have.length(0));
     it('should have no pretty drops with an odd tag', () =>
       ocean.prettyListDrops(oddTag).should.eventually.match(/No drops/));
     it('should have zero or more drops with no tag', async () => {
       const drops = await ocean.listDrops();
       const report = await ocean.prettyListDrops();
-      d(`\n${report}`);
-      // d('drops', drops);
+      d(`All current drops\n${report}`);
       (drops.length >= 0).should.be.true();
     });
+  });
+
+
+  describe('List actions', function () {
+    it('should have make a report of the last items', async function shouldL() {
+      const report = await ocean.prettyLastActions(5);
+      d(`\n${report}`);
+      (report.length > 0).should.be.true();
+      (report.split('\n').should.be.length(6));
+    });
+  });
+
     it('should have transient incomplete actions', async () => {
       d(`\n${(await ocean.prettyListDrops())}`);
       d('...A');
