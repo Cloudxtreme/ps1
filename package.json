@@ -12,7 +12,7 @@
     "start": "if-env NODE_ENV=production && yarn run start:prod || yarn run start:dev",
     "start:dev": "webpack-dev-server -d --inline --content-base public --history-api-fallback",
     "start:prod": "webpack && node server.js",
-    "list": "babel-node src/deploy/list.js",
+    "drops": "babel-node src/deploy/list.js",
     "exterminate": "babel-node src/deploy/exterminate.js"
   },
   "devDependencies": {
