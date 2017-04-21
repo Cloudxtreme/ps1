@@ -13,6 +13,7 @@
     "start:dev": "webpack-dev-server -d --inline --content-base public --history-api-fallback",
     "start:prod": "webpack && node server.js",
     "drops": "babel-node src/deploy/list.js",
+    "actions": "babel-node src/deploy/actions.js",
     "exterminate": "babel-node src/deploy/exterminate.js",
     "lint": "eslint src/**/*.js"
   },
