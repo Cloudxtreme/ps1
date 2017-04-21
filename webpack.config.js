@@ -4,7 +4,8 @@ var webpack = require('webpack');
 var slash = path.join;
 
 module.exports = {
-  entry: slash(__dirname, 'src', 'client.js'),
+  entry: ['babel-polyfill', slash(__dirname, 'src', 'client.js')],
+     // add babel-polyfill per http://stackoverflow.com/a/41062991/1320510
 
   output: {
     path: slash(__dirname, '/public'),

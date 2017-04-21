@@ -7,7 +7,7 @@
   "author": "Charles Merriam <charles.merriam@gmail.com>",
   "license": "AAL",
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register 'src/**/test*.js'",
+    "test": "mocha --compilers js:babel-core/register --require babel-polyfill 'src/**/test*.js'",
     "push": "git push origin master",
     "start": "if-env NODE_ENV=production && yarn run start:prod || yarn run start:dev",
     "start:dev": "webpack-dev-server -d --inline --content-base public --history-api-fallback",
@@ -16,11 +16,6 @@
     "exterminate": "babel-node src/deploy/exterminate.js"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.0",
-    "babel-core": "^6.24.0",
-    "babel-loader": "^6.4.1",
-    "babel-preset-es2015": "^6.24.0",
-    "babel-preset-react": "^6.23.0",
     "chai": "^3.5.0",
     "compression": "*",
     "eslint": "*",
@@ -38,6 +33,10 @@
     "webpack-dev-server": "^2.4.2"
   },
   "dependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-react": "^6.24.1",
     "better-console": "^1.0.0",
     "chalk": "^1.1.3",
     "do-wrapper": "^3.11.1",
