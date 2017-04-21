@@ -12,25 +12,7 @@ export default class Ocean {
     this.api = new DO(config.digitalOceanAPI, 99);
   }
 
-  async completeCreateDrop(dropletId) {
-    // poll DigitalOcean until the given dropletId creation is complete.
-    // return true, else throw
-    d('completing drop', dropletId);
-    const retryDelays = [3000, 9000, 12000, 14000, 16000];
-    for (let i = 0; i < retryDelays.length; i += 1) {
-      /*  eslint-disable no-await-in-loop */
-      await wait(retryDelays[i]);
-      const result = await this.api.dropletsGetById(dropletId);
-      d('.... polled droplet');
-      ddir('checking droplet', result.body);
-      if (_.get(result, 'body.droplet.status') === 'active') {
-        return true;
-      }
-    }
-    throw new Error(`DigitalOcean failed to complete droplet ${dropletId}`);
-  }
-
-
+  //= ===== ACTIONS
   async completeAction(actionId) {
     // poll DigitalOcean until the given actionId is complete.
     // return true, else throw
@@ -46,7 +28,6 @@ export default class Ocean {
         ddir('could not found action.status', result);
         throw new Error(`DigitalOcean failed to return action status for ${actionId}`);
       } else if (status === 'completed') {
-        ddir('passing action has this body', result.body);
         if (action.type === 'create' &&
             action.resource_type === 'droplet') {
           await this.completeCreateDrop(action.resource_id);
@@ -100,6 +81,25 @@ export default class Ocean {
   }
 
 
+  //= ===== REPORTING
+
+  //= ===== CREATE
+
+  async completeCreateDrop(dropletId) {
+    // poll DigitalOcean until the given dropletId creation is complete.
+    // return true, else throw
+    d('completing drop', dropletId);
+    const retryDelays = [3000, 9000, 12000, 14000, 16000];
+    for (let i = 0; i < retryDelays.length; i += 1) {
+      /*  eslint-disable no-await-in-loop */
+      await wait(retryDelays[i]);
+      const result = await this.api.dropletsGetById(dropletId);
+      d('.... polled droplet');
+      if (_.get(result, 'body.droplet.status') === 'active') {
+        return true;
+      }
+    }
+    throw new Error(`DigitalOcean failed to complete droplet ${dropletId}`);
   }
 
 
@@ -136,30 +136,41 @@ export default class Ocean {
     return out;
   }
 
-  async destroyDrops(tag = '') {
-    // destroy all drops matching tag, waiting until action is done.
-    // Annoyingly, the do_wrapper documentation is wrong for when no
-    // tag is passed; only one droplet can then be deleted per call.
-    // returns number of drops destroyed.
+  async rawDestroyDrops(dropIds) {
+    // promise to destroy a drops given dropIds.
     // Note that DigitalOcean doesn't return the actionIDs, just a
     // status 204 to note that is accepted the request.
-    const drops = await this.listDrops(tag);
-    if (drops.length === 0) {
-      return 0;
+    // Note that 'machine already gone' type errors happen in testing, so
+    // no promise.all..
+    const results = [];
+    for (let i = 0; i < dropIds.length; i += 1) {
+      try {
+        const result = await this.api.dropletsDelete(dropIds[i]);
+        results.push(result);
+      } catch (err) {
+        if (!err.message.match(/The resource you were accessing could not be found/)) {
+          throw err;
+        }
+          // ignore droplets a dlready deleted
+      }
     }
-    d('drops found:', drops);
-    const promises = [];
-    for (let i = 0; i < drops.length; i += 1) {
-      promises.push(this.api.dropletsDelete([drops[i].id]));
-    }
-    const results = await Promise.all(promises);
-    const status = _.get(results, '[0].response.IncomingMessage.statusCode');
-    if (status !== 204) {
-      ddir('Did not get status 204 from DO.', results);
-    }
+    return results;
+  }
+
+  async destroyDrops(tag = '', name = '') {
+    // destroy all drops matching tag, waiting until action is done.
+    // returns number of drops destroyed.
+    const drops = await this.listDrops(tag, name);
+    const dropIds = _.map(drops, 'id');
+    await this.rawDestroyDrops(dropIds);
     d('await actions');
-    const actions = await this.listIncomplete();
-    d('incomplete actions = ', actions);
+    const actions = await this.lastActions(drops.length);
+    const actionIds = _.map(actions, 'id');
+    const promises = [];
+    for (let i = 0; i < actionIds.length; i += 1) {
+      promises.push(this.completeAction(actionIds[i]));
+    }
+    await Promise.all(promises);
     return drops.length;
   }
 
@@ -188,11 +199,12 @@ export default class Ocean {
   async createDrop(tag, name) {
       // create a drop, waiting until creation is complete.
       // May take a while, like 30 seconds.
+      // returns the dropletId for the new droplet.
     const result = await this.rawCreateDrop(tag, name);
     const actionId = _.get(result, 'body.links.actions[0].id');
     const dropletId = _.get(result, 'body.droplet.id');
-    d('action id is', actionId);
-    await this.complete(actionId);
+    d('creation action id is', actionId);
+    await this.completeAction(actionId);
     return dropletId;
   }
 }
