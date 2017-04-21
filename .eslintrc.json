@@ -28,6 +28,12 @@
     "jsx-a11y/img-has-alt": "warn",
     "prefer-arrow-callback": "off",
     "prefer-object-spread/prefer-object-spread": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "varsIgnorePattern": "d|ddir"
+      }
+    ],
     "import/no-extraneous-dependencies": [
       "error",
       {
