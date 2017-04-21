@@ -13,7 +13,8 @@
     "start:dev": "webpack-dev-server -d --inline --content-base public --history-api-fallback",
     "start:prod": "webpack && node server.js",
     "drops": "babel-node src/deploy/list.js",
-    "exterminate": "babel-node src/deploy/exterminate.js"
+    "exterminate": "babel-node src/deploy/exterminate.js",
+    "lint": "eslint src/**/*.js"
   },
   "devDependencies": {
     "chai": "^3.5.0",
