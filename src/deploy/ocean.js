@@ -48,15 +48,21 @@ export default class Ocean {
     // be efficient later...  either promises or pages
     const actions = [];
     for (let i = (lastAction - number) + 1; i <= lastAction; i += 1) {
-      const response = await this.api.accountGetActions({ per_page: 1, page: i });
-      actions.push(response.body.actions[0]);
+      try {
+        const response = await this.api.accountGetActions({ per_page: 1, page: i });
+        actions.push(response.body.actions[0]);
+      } catch (err) {
+        if (!err.message.match(/The resource you were accessing could not be found./)) {
+          throw err;
+        }
+      }
     }
     return actions;
   }
 
   async prettyLastActions(number = 2) {
     const actions = await this.lastActions(number);
-    const lines = ['actionID    status       type            droplet_id   droplet_status'];
+    const lines = ['actionID    status       type            droplet_id'];
     for (let i = 0; i < actions.length; i += 1) {
       const action = actions[i];
       let dStatus = '';
