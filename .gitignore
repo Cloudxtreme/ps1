@@ -6,3 +6,4 @@ babel_cache
 bundle.js
 *.map
 private_*
+coverage
