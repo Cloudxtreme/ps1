@@ -3042,6 +3042,15 @@ node-pre-gyp@^0.6.29, node-pre-gyp@^0.6.34, node-pre-gyp@^0.6.5:
     tar "^2.2.1"
     tar-pack "^3.4.0"
 
+node-ssh@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/node-ssh/-/node-ssh-4.2.2.tgz#8b3fecce1be20109d850029919de8eac25e900cb"
+  dependencies:
+    sb-promisify "^2.0.1"
+    sb-scandir "^1.0.0"
+    shell-escape "^0.2.0"
+    ssh2 "^0.5.0"
+
 node-uuid@~1.4.7:
   version "1.4.8"
   resolved "https://registry.yarnpkg.com/node-uuid/-/node-uuid-1.4.8.tgz#b040eb0923968afabf8d32fb1f17f1167fdab907"
@@ -3773,6 +3782,20 @@ safe-buffer@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.0.1.tgz#d263ca54696cd8a306b5ca6551e92de57918fbe7"
 
+sb-promisify@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/sb-promisify/-/sb-promisify-1.3.0.tgz#3af6f1fa9ffc833f14de86916eefc1f559b1b051"
+
+sb-promisify@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/sb-promisify/-/sb-promisify-2.0.1.tgz#86c6cb4e1780c9b38c6fbe7e7873f8ab9677ce2a"
+
+sb-scandir@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/sb-scandir/-/sb-scandir-1.0.0.tgz#102b4666c7b644f4287f0d33ceb4374fac1bfa15"
+  dependencies:
+    sb-promisify "^1.3.0"
+
 select-hose@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
@@ -3859,6 +3882,10 @@ sha.js@^2.3.6:
   dependencies:
     inherits "^2.0.1"
 
+shell-escape@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/shell-escape/-/shell-escape-0.2.0.tgz#68fd025eb0490b4f567a027f0bf22480b5f84133"
+
 shell-quote@^1.4.3:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.6.1.tgz#f4781949cce402697127430ea3b3c5476f481767"
@@ -3921,13 +3948,6 @@ should@^11.2.1:
 signal-exit@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
-
-simple-ssh@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/simple-ssh/-/simple-ssh-0.9.0.tgz#e2df011d6df50d13cbfea5243a36b23250dcedb2"
-  dependencies:
-    ssh2 "^0.5.0"
-    xtend "^4.0.1"
 
 slash@^1.0.0:
   version "1.0.0"
@@ -4630,7 +4650,7 @@ xmldom@0.1.x:
   version "0.1.27"
   resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.27.tgz#d501f97b3bdb403af8ef9ecc20573187aadac0e9"
 
-xtend@^4.0.0, xtend@^4.0.1:
+xtend@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.1.tgz#a5c6d532be656e23db820efb943a1f04998d63af"
 
