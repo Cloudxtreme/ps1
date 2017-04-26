@@ -1,7 +1,6 @@
 /* ocean.js -- My wrapper for DigitalOcean (DO) calls */
 import DO from 'do-wrapper';
 import _ from 'lodash';
-// import console from 'better-console';
 import 'source-map-support/register';   // hack for sourcemaps
 import config from '../../private_config';
 import { d, ddir } from '../logging';
@@ -102,6 +101,8 @@ export default class Ocean {
       const result = await this.api.dropletsGetById(dropletId);
       d('.... polled droplet');
       if (_.get(result, 'body.droplet.status') === 'active') {
+        await wait(25000);  // give DigitalOcean additional time to set up networks and SSH daemon
+        // maybe run a smoke on the machine here?
         return true;
       }
     }
@@ -164,19 +165,12 @@ export default class Ocean {
   }
 
   async destroyDrops(tag = '', name = '') {
-    // destroy all drops matching tag, waiting until action is done.
+    // destroy all drops matching tag, waiting, probably, until done.
     // returns number of drops destroyed.
     const drops = await this.listDrops(tag, name);
     const dropIds = _.map(drops, 'id');
     await this.rawDestroyDrops(dropIds);
-    d('await actions');
-    const actions = await this.lastActions(drops.length);
-    const actionIds = _.map(actions, 'id');
-    const promises = [];
-    for (let i = 0; i < actionIds.length; i += 1) {
-      promises.push(this.completeAction(actionIds[i]));
-    }
-    await Promise.all(promises);
+    await wait(20000);  // stupid @#$@# ocean
     return drops.length;
   }
 
