@@ -1,7 +1,9 @@
 // because of node debugger problems
 // make 'tests' run then transfer.
 import assert from 'assert';
+import chalk from 'chalk';
 import NodeSSH from 'node-ssh';
+import http from 'http';
 import Ocean from './ocean';
 import { d, ddir } from '../logging';
 // import { wait } from '../junkDrawer';
@@ -52,12 +54,12 @@ async function getStagingSSH(ip, userName) {
 async function executeCommands(ssh, cmds) {
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < cmds.length; i += 1) {
-    const cmd = cmds[i];
-    d(`Cmd:\t\t\t|${cmd}`);
+    const cmd = cmds[i].trim();
+    console.log(`${chalk.cyan('Cmd:')}\t\t\t|${chalk.black(cmd)}`);
     const o = await ssh.execCommand(cmd);
     const out = o.stdout.split('\n').join('\n\t\t\t|');
-    const err = `  stderr:\t\t|${o.stderr.split('\n').join('\n\t\t\t|')}`;
-    d(`  stdout:\t\t|${out}\n${err ? o.stderr : ''}`);
+    const err = `  ${chalk.cyan('stderr:')}\t\t|${o.stderr.split('\n').join('\n\t\t\t|')}`;
+    console.log(`  ${chalk.cyan('stdout:')}\t\t|${chalk.magenta(out)}\n${o.stderr ? chalk.red(err) : ''}`);
   }
 }
 
@@ -69,12 +71,12 @@ async function foo() {
   apt-get install curl
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-  curl -sL https://deb.nodesource.com/setup_${nodeVersion} -o nodesource_setup.sh | bash -
+  curl -sL https://deb.nodesource.com/setup_${nodeVersion} | bash -
   apt-get update
 
   apt-get -y install curl git
-  apt-get -y install yarn
   apt-get -y install nodejs
+  apt-get -y install yarn
   `;
   const redirectPort80 = `
   iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
@@ -98,7 +100,7 @@ async function foo() {
   `;
 
   const userStartServer = `
-  cd ${userDir}/${repoName}; yarn start:prod
+  cd ${userDir}/${repoName}; nohup yarn start:prod > prod.out 2> prod.err < /dev/null &
   `;
 
   let asRoot = ['uname -a', 'whoami', installPackages, redirectPort80, createUser];
@@ -109,6 +111,7 @@ async function foo() {
   // make an array of individual, nonblank lines
 
   const ip = await getStagingIP();
+
   d(`Current drops are:\n${await ocean.prettyListDrops()}`);
 
   d(`Checkpoint 2 - ip ${ip} obtained`);
@@ -122,6 +125,21 @@ async function foo() {
   const ps1SSH = await getStagingSSH(ip, userName);
   await executeCommands(ps1SSH, asUser);
   ps1SSH.dispose();
+  d('checkpoint 4 - user commands run');
+  const address = `http://${ip}:80`;
+  d(address);
+
+  http.get(`http://${ip}:80`, (res) => {
+    d(`status is ${res.statusCode} - ${res.statusName}`);
+    let body = '';
+    res.on('data', (data) => { body += data; });
+    res.on('end', () => {
+      console.log('body = ', body);
+      if (body.match(/The Bash Prompt/gm)) {
+        console.log('TEST PASSED');
+      }
+    });
+  });
   d('99.   This program is gratified to be of use.');
 }
 
