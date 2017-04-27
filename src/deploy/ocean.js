@@ -1,7 +1,8 @@
 /* ocean.js -- My wrapper for DigitalOcean (DO) calls */
 import DO from 'do-wrapper';
 import _ from 'lodash';
-import 'source-map-support/register';   // hack for sourcemaps
+import NodeSSH from 'node-ssh';
+// import 'source-map-support/register';   // hack for sourcemaps
 import config from '../../private_config';
 import { d, ddir } from '../logging';
 import { wait } from '../junkDrawer';
@@ -169,6 +170,7 @@ export default class Ocean {
     // returns number of drops destroyed.
     const drops = await this.listDrops(tag, name);
     const dropIds = _.map(drops, 'id');
+    if (dropIds.length === 0) return 0;
     await this.rawDestroyDrops(dropIds);
     await wait(20000);  // stupid @#$@# ocean
     return drops.length;
@@ -196,15 +198,42 @@ export default class Ocean {
     return p;
   }
 
+  async isDropReady(tag, name) {
+    try {
+      const listDropsResults = await this.listDrops(tag, name);
+      ddir('listdropsres =', listDropsResults);
+      const ip = listDropsResults[0].networks.v4[0].ip_address;
+      d('ip');
+      const ssh = new NodeSSH();
+      await ssh.connect({ host: ip,
+        username: 'root',
+        privateKey: config.digitalOceanPrivkey,
+        passphrase: config.digitalOceanPassPhrase });
+      d('ssh1');
+      await ssh.execCommand('uname -a');
+      d('ssh2');
+    } catch (err) {
+      d(`creation error ${err}, waiting`);
+      return false;
+    }
+    return true;
+  }
+
   async createDrop(tag, name) {
       // create a drop, waiting until creation is complete.
       // May take a while, like 30 seconds.
       // returns the dropletId for the new droplet.
+    d(`creating drop ${tag}-${name}`);
     const result = await this.rawCreateDrop(tag, name);
-    const actionId = _.get(result, 'body.links.actions[0].id');
     const dropletId = _.get(result, 'body.droplet.id');
-    d('creation action id is', actionId);
-    await this.completeAction(actionId);
+
+    for (;;) {
+      await wait(5000);
+      if (await this.isDropReady(tag, name)) {
+        d('ready');
+        break;
+      }
+    }
     return dropletId;
   }
 }
