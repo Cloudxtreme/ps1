@@ -28,6 +28,8 @@ async function createStagingDrop() {
 }
 
 async function getStagingIP() {
+  // if I can't get the staging drop IP, kill it and make a new one,
+  // if I still can't make it, throw.
   let ip;
   try {
     const res = await ocean.listDrops(tag, name);
@@ -37,6 +39,7 @@ async function getStagingIP() {
     const res = await ocean.listDrops(tag, name);
     ip = getIPFromResults(res);
   }
+  assert(ip, 'Cannot get IP from staging server');
   return ip;
 }
 
@@ -47,11 +50,12 @@ async function getStagingSSH(ip, userName) {
     username: userName,
     privateKey: config.digitalOceanPrivkey,
     passphrase: config.digitalOceanPassPhrase });
-  // check ssh worked?
+  assert(ssh, `Cannot get staging server SSH for ${userName}@${ip}`);
   return ssh;
 }
 
 async function executeCommands(ssh, cmds) {
+  // execute array of commands on given ssh, with nice output.
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < cmds.length; i += 1) {
     const cmd = cmds[i].trim();
@@ -65,6 +69,7 @@ async function executeCommands(ssh, cmds) {
 
 async function foo() {
   d('Checkpoint 1 - starting foo');
+
   const nodeVersion = '7.x';
   const installPackages = `
   # Add yarn repo
@@ -129,6 +134,7 @@ async function foo() {
   const address = `http://${ip}:80`;
   d(address);
 
+  // check that port 80 provides something.
   http.get(`http://${ip}:80`, (res) => {
     d(`status is ${res.statusCode} - ${res.statusName}`);
     let body = '';
