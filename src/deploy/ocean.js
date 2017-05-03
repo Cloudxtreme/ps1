@@ -12,105 +12,6 @@ export default class Ocean {
     this.api = new DO(config.digitalOceanAPI, 99);
   }
 
-  //= ===== ACTIONS
-  async completeAction(actionId) {
-    // poll DigitalOcean until the given actionId is complete.
-    // return true, else throw
-    const retryDelays = [3000, 9000, 12000, 14000, 16000];
-    for (let i = 0; i < retryDelays.length; i += 1) {
-      /*  eslint-disable no-await-in-loop */
-      await wait(retryDelays[i]);
-      const result = await this.api.accountGetAction(actionId);
-      d('.... polled action');
-      const action = _.get(result, 'body.action');
-      const status = _.get(action, 'status');
-      if (!status) {
-        ddir('could not found action.status', result);
-        throw new Error(`DigitalOcean failed to return action status for ${actionId}`);
-      } else if (status === 'completed') {
-        if (action.type === 'create' &&
-            action.resource_type === 'droplet') {
-          await this.completeCreateDrop(action.resource_id);
-        }
-        return true;
-      }
-    }
-    throw new Error(`DigitalOcean failed to complete action ${actionId}`);
-  }
-
-  async lastActions(number = 2) {
-    // return array of last actions
-    // first, find the last action
-    const result = await this.api.accountGetActions({ per_page: 1, page: 1 });
-    const lastLine = _.get(result, 'body.links.pages.last');
-    const lastAction = parseInt(lastLine.match(/page=(.*)&per_page/)[1], 10);
-
-    // be efficient later...  either promises or pages
-    const actions = [];
-    for (let i = (lastAction - number) + 1; i <= lastAction; i += 1) {
-      try {
-        const response = await this.api.accountGetActions({ per_page: 1, page: i });
-        actions.push(response.body.actions[0]);
-      } catch (err) {
-        if (!err.message.match(/The resource you were accessing could not be found./)) {
-          throw err;
-        }
-      }
-    }
-    return actions;
-  }
-
-  async prettyLastActions(number = 2) {
-    const actions = await this.lastActions(number);
-    const lines = ['actionID    status       type            droplet_id'];
-    for (let i = 0; i < actions.length; i += 1) {
-      const action = actions[i];
-      let dStatus = '';
-      let dId = '';
-      // fill in droplet status
-      if (action.resource_type === 'droplet') {
-        dId = action.resource_id;
-        try {
-          const result = await this.api.dropletsGetById(dId);
-          dStatus = _.get(result, 'body.droplet.status');
-        } catch (err) {
-          if (!err.message.match(/The resource you were accessing could not be found./)) {
-            throw err;
-          }
-          // ignore missing droplet, e.g., deleted.
-        }
-      }
-      lines.push(`${action.id}   ${_.padEnd(action.status, 12)} ${_.padEnd(action.type, 15)} ${dId}  ${dStatus}`);
-    }
-    const out = (lines).join('\n');
-    return out;
-  }
-
-
-  //= ===== REPORTING
-
-  //= ===== CREATE
-
-  async completeCreateDrop(dropletId) {
-    // poll DigitalOcean until the given dropletId creation is complete.
-    // return true, else throw
-    d('completing drop', dropletId);
-    const retryDelays = [3000, 9000, 12000, 14000, 16000];
-    for (let i = 0; i < retryDelays.length; i += 1) {
-      /*  eslint-disable no-await-in-loop */
-      await wait(retryDelays[i]);
-      const result = await this.api.dropletsGetById(dropletId);
-      d('.... polled droplet');
-      if (_.get(result, 'body.droplet.status') === 'active') {
-        await wait(25000);  // give DigitalOcean additional time to set up networks and SSH daemon
-        // maybe run a smoke on the machine here?
-        return true;
-      }
-    }
-    throw new Error(`DigitalOcean failed to complete droplet ${dropletId}`);
-  }
-
-
   async listDrops(tag = '', name = '') {
     // return array of droplet objects, as returned by DigitalOcean.
     const searchTerm = tag ? { tag_name: tag } : '';
@@ -126,9 +27,7 @@ export default class Ocean {
     return droplets;
   }
 
-  async prettyListDrops(tag = '', name = '') {
-    // return string with pretty printed list of droplets
-    const droplets = await this.listDrops(tag, name);
+  static formatPrettyListDrops(tag, name, droplets) {
     if (droplets.length === 0) {
       return 'No drops found';
     }
@@ -144,26 +43,12 @@ export default class Ocean {
     return out;
   }
 
-  async rawDestroyDrops(dropIds) {
-    // promise to destroy a drops given dropIds.
-    // Note that DigitalOcean doesn't return the actionIDs, just a
-    // status 204 to note that is accepted the request.
-    // Note that 'machine already gone' type errors happen in testing, so
-    // no promise.all..
-    const results = [];
-    for (let i = 0; i < dropIds.length; i += 1) {
-      try {
-        const result = await this.api.dropletsDelete(dropIds[i]);
-        results.push(result);
-      } catch (err) {
-        if (!err.message.match(/The resource you were accessing could not be found/)) {
-          throw err;
-        }
-          // ignore droplets a dlready deleted
-      }
-    }
-    return results;
+  async prettyListDrops(tag = '', name = '') {
+    // return string with pretty printed list of droplets
+    const droplets = await this.listDrops(tag, name);
+    return Ocean.formatPrettyListDrops(tag, name, droplets);
   }
+
 
   async destroyDrops(tag = '', name = '') {
     // destroy all drops matching tag, waiting, probably, until done.
@@ -171,9 +56,24 @@ export default class Ocean {
     const drops = await this.listDrops(tag, name);
     const dropIds = _.map(drops, 'id');
     if (dropIds.length === 0) return 0;
-    await this.rawDestroyDrops(dropIds);
-    await wait(20000);  // stupid @#$@# ocean
-    return drops.length;
+
+    // So, digitalOcean has no return that a drop was actually deleted,
+    // just returning a status code that is accepts the need to delete a drop.
+    // My strategy is to ask each drop to be deleted, then wait until all are
+    // are gone.
+    for (let i = 0; i < dropIds.length; i += 1) {
+      this.api.dropletsDelete(dropIds[i]);
+    }
+    const pollingWaits = [3000, 7000, 10000, 10000, 10000, 10000];
+    for (let i = 0; i < pollingWaits.length; i += 1) {
+      /* eslint-disable no-await-in-loop */
+      await wait(pollingWaits[i]);
+      const remainingDrops = await this.listDrops(tag, name);
+      if (remainingDrops.length === 0) {
+        return drops.length;
+      }
+    }
+    throw new Error(`Unable to delete drops ${tag}:${name}`);
   }
 
   rawCreateDrop(tag, name) {
@@ -201,39 +101,42 @@ export default class Ocean {
   async isDropReady(tag, name) {
     try {
       const listDropsResults = await this.listDrops(tag, name);
-      ddir('listdropsres =', listDropsResults);
+      // first test, did it return and did it have an ip address set up?
       const ip = listDropsResults[0].networks.v4[0].ip_address;
-      d('ip');
+      // second test, can I SSH into it for a command?
       const ssh = new NodeSSH();
       await ssh.connect({ host: ip,
         username: 'root',
         privateKey: config.digitalOceanPrivkey,
         passphrase: config.digitalOceanPassPhrase });
-      d('ssh1');
       await ssh.execCommand('uname -a');
-      d('ssh2');
     } catch (err) {
-      d(`creation error ${err}, waiting`);
+      // console.log('err is ', err);
       return false;
     }
     return true;
   }
 
   async createDrop(tag, name) {
-      // create a drop, waiting until creation is complete.
-      // May take a while, like 30 seconds.
-      // returns the dropletId for the new droplet.
+      // create a drop, if needed, waiting until creation is complete.
+      // May take around 30 seconds.
+      // returns true or throws
     d(`creating drop ${tag}-${name}`);
+    // First, if drop is up and running, just return the dropletId.
+    if (this.isDropReady(tag, name)) {
+      return true;
+    }
     const result = await this.rawCreateDrop(tag, name);
     const dropletId = _.get(result, 'body.droplet.id');
+    const pollingWaits = [3000, 7000, 10000, 10000, 10000, 10000];
 
-    for (;;) {
-      await wait(5000);
+    for (let i = 0; i < pollingWaits.length; i += 1) {
+      /* eslint-disable no-await-in-loop */
+      await wait(pollingWaits[i]);
       if (await this.isDropReady(tag, name)) {
-        d('ready');
-        break;
+        return true;
       }
     }
-    return dropletId;
+    throw new Error('Unable to create drop');
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-import _ from 'lodash';
+// import _ from 'lodash';
 import 'should';
 import Ocean from './ocean';
 import { d, ddir } from '../logging';
@@ -24,75 +24,54 @@ describe('Ocean Drops Interface', function () {
       (drops.length >= 0).should.be.true();
     });
   });
+  // Could add a bunch of tests for just formatting the prettyDrops....
 
-
-  describe('List actions', function () {
-    it('should have make a report of the last items', async function shouldL() {
-      const report = await ocean.prettyLastActions(5);
-      d(`\n${report}`);
-      (report.length > 0).should.be.true();
-      (report.split('\n').should.be.length(6));
+  describe('Can handles Create/Destroy cycle', function createDestroyCycle() {
+    it('should exterminate existing test drops and have none', function step1(done) {
+      ocean.destroyDrops(testTag).then(() =>
+        ocean.listDrops(testTag).should.eventually.have.length(0).then(done));
     });
-  });
-
-  describe('Test raw functionality', function () {
-    it('should have transient incomplete actions', async () => {
-      d(`Drops before raw\n${(await ocean.prettyListDrops())}`);
-
-      const result = await ocean.rawCreateDrop(testTag, 'raw');
-      result.should.not.be.empty();
-      d(`Including action in progress\n${await ocean.prettyLastActions()}`);
-      d(`Drops in progress\n${await ocean.prettyListDrops()}`);
-      // ocean.prettyListDrops(testTag, 'raw').then((report) {
-      //   report.split('\n').should.matchAny(/new/);
-      //    d(`Including just created drop\n${report}`);
-      //  });
-      const actionId = _.get(result, 'body.links.actions[0].id');
-      (actionId > 0).should.be.true();
-      d('new drop with actionId ', actionId);
-      await ocean.completeAction(actionId);
-      (await ocean.prettyListDrops()).split('\n').should.not.matchAny(/new/);
+    it('should require two arguments to create a drop', (done) => {
+      ocean.createDrop(testTag).should.be.rejectedWith(/required/)
+      .catch(() => {}).then(done);
     });
-  });
-
-  describe('Create and destroy drops', function () {
-    it('should exterminate existing test drops and have none', async () => {
-      await ocean.destroyDrops(testTag);
-      ocean.listDrops(testTag).should.eventually.have.length(0);
-      d(`Old ${testTag} drops exterminated`);
+    it('should create "simple" drop', function (done) {
+      ocean.createDrop(testTag, 'simple')
+      .then(() =>
+        ocean.listDrops(testTag, 'simple').should.eventually.have.length(1))
+      .then(done);
     });
-    it('should require two arguments to create a drop', () => {
-      ocean.createDrop(testTag).should.be.rejectedWith(/required/);
-    });
-    it('should create "simple" drop', async function () {
-      const dropId = await ocean.createDrop(testTag, 'simple');
-      dropId.should.be.above(0);
-    });
-    it('should have only one "simple" drop', async function () {
-      const drops = await ocean.listDrops(testTag, 'simple');
-      drops.should.have.length(1);
-    });
-    it('should find "simple" drop by name and tag', async function () {
-      const testExp = new RegExp(testTag);
-      let pretty = await ocean.prettyListDrops();
-      d(`All drops after 'simple' creation drops is\n${pretty}`);
+    const testExp = new RegExp(testTag);
+    it('should find "simple" with just tag', async function () {
+      const pretty = await ocean.prettyListDrops(testTag);
       // note that JS does not just 'match' multiline strings
       pretty.split('\n').should.matchAny(/simple/);
       pretty.split('\n').should.matchAny(testExp);
-      pretty = await ocean.prettyListDrops(testExp);
-      pretty.split('\n').should.matchAny(/simple/);
-      pretty.split('\n').should.matchAny(testExp);
-      pretty = await ocean.prettyListDrops('', 'simple');
-      pretty.split('\n').should.matchAny(/simple/);
-      pretty.split('\n').should.matchAny(testExp);
-      pretty = await ocean.prettyListDrops(testTag, 'simple');
+    });
+    it('should find "simple" with regex of test tag', async function () {
+      const pretty = await ocean.prettyListDrops(testExp);
       pretty.split('\n').should.matchAny(/simple/);
       pretty.split('\n').should.matchAny(testExp);
     });
-    it('should destroy simple drop by name');
-    it('should not longer find simple drop');
-    it('should create three drops, find them, delete one, and find the other two');
-    it('should exterminate the drops and not find them');
+    it('should find "simple" with just tag', async function () {
+      const pretty = await ocean.prettyListDrops(testTag);
+      pretty.split('\n').should.matchAny(/simple/);
+      pretty.split('\n').should.matchAny(testExp);
+    });
+    it('should find "simple" with just name', async function () {
+      const pretty = await ocean.prettyListDrops('', 'simple');
+      pretty.split('\n').should.matchAny(/simple/);
+      pretty.split('\n').should.matchAny(testExp);
+    });
+    it('should find "simple" with tag and name', async function () {
+      const pretty = await ocean.prettyListDrops(testTag, 'simple');
+      pretty.split('\n').should.matchAny(/simple/);
+      pretty.split('\n').should.matchAny(testExp);
+    });
+    it('should destroy simple drop by name', function destroyIt() {
+      ocean.destroyDrops('', 'simple').then(() =>
+         ocean.listDrops(testTag, 'simple').should.eventually.have.length(0));
+    });
   });
 
   describe('Form basic ssh functions', function () {
